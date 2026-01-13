@@ -4,9 +4,10 @@ window.SITE_CONFIG = {
 
   phone: "+998910094469",
   phonePretty: "+998 91 009 44 69",
-  telegram: "breezeservice",
+
+  telegram: "breezeserv1se",
   whatsapp: "+998910094469",
-  instagram: "breezeservice",
+  instagram: "breezeservise.uz",
 
   areas: "Ташкент • выезд за город до 1–2 км — по договорённости",
   hours: "Звонки: 10:00–18:00",
