@@ -1,163 +1,193 @@
 (function () {
   const cfg = window.SITE_CONFIG || {};
 
-  // helpers
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-  const esc = (s) => String(s ?? "");
-  const el = (tag, cls) => {
-    const n = document.createElement(tag);
-    if (cls) n.className = cls;
-    return n;
-  };
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // bind simple text fields
-  $$("[data-bind]").forEach((node) => {
-    const key = node.getAttribute("data-bind");
-    if (cfg[key] != null) node.textContent = cfg[key];
+  // Bind simple text nodes
+  $$("[data-bind]").forEach((el) => {
+    const key = el.getAttribute("data-bind");
+    if (cfg[key] != null) el.textContent = cfg[key];
   });
 
-  // year
-  $("#year").textContent = new Date().getFullYear();
+  // Year
+  const y = $("#year");
+  if (y) y.textContent = new Date().getFullYear();
 
-  // contacts
-  $("#phoneText").textContent = cfg.phonePretty || cfg.phone || "—";
-  $("#tgText").textContent = cfg.telegram ? ("@" + cfg.telegram) : "—";
+  // Phone / messenger links
+  const phone = cfg.phone || "";
+  const phonePretty = cfg.phonePretty || phone;
+  const tg = cfg.telegram || "";
+  const wa = cfg.whatsapp || "";
 
-  // buttons
-  const phoneRaw = (cfg.phone || "").trim();
-  $("#callBtn").href = phoneRaw ? ("tel:" + phoneRaw) : "#";
-  $("#tgBtn").href = cfg.telegram ? ("https://t.me/" + cfg.telegram) : "#";
-  $("#waBtn").href = cfg.whatsapp ? ("https://wa.me/" + String(cfg.whatsapp).replace(/\D/g, "")) : "#";
+  const phoneText = $("#phoneText");
+  if (phoneText) phoneText.textContent = phonePretty;
 
-  // hero pills
-  const pills = $("#heroPills");
-  (cfg.heroPills || []).forEach((t) => {
-    const p = el("div", "pill");
-    p.textContent = t;
-    pills.appendChild(p);
-  });
+  const tgText = $("#tgText");
+  if (tgText) tgText.textContent = tg ? `@${tg}` : "—";
 
-  // popular
-  const pop = $("#popularGrid");
-  (cfg.popular || []).forEach((x) => {
-    const c = el("div", "s-card");
-    const h = el("h4"); h.textContent = x.title;
-    const p = el("p"); p.textContent = x.text;
-    c.append(h, p);
-    pop.appendChild(c);
-  });
+  const waText = $("#waText");
+  if (waText) waText.textContent = wa ? wa.replace(/(\+998)(\d{2})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3-$4-$5") : "—";
 
-  // prices
-  $("#fromPrice").textContent = cfg.fromPrice || "—";
+  const callBtn = $("#callBtn");
+  if (callBtn && phone) callBtn.href = `tel:${phone.replace(/\s+/g, "")}`;
 
-  // badges
+  const tgBtn = $("#tgBtn");
+  if (tgBtn && tg) tgBtn.href = `https://t.me/${tg}`;
+
+  const waBtn = $("#waBtn");
+  if (waBtn && wa) waBtn.href = `https://wa.me/${wa.replace(/[^\d]/g, "")}`;
+
+  // Price + badges
+  const fromPrice = $("#fromPrice");
+  if (fromPrice) fromPrice.textContent = cfg.fromPrice || "—";
+
+  const priceHint = $("#priceHint");
+  if (priceHint) priceHint.textContent = cfg.priceHint || "";
+
   const badges = $("#badges");
-  (cfg.badges || []).forEach((t) => {
-    const b = el("span", "badge"); b.textContent = t;
-    badges.appendChild(b);
-  });
+  if (badges && Array.isArray(cfg.badges)) {
+    badges.innerHTML = cfg.badges.map((t) => `<span class="badge">${escapeHtml(t)}</span>`).join("");
+  }
+
   const sideBadges = $("#sideBadges");
-  (cfg.sideBadges || []).forEach((t) => {
-    const b = el("span", "badge"); b.textContent = t;
-    sideBadges.appendChild(b);
-  });
+  if (sideBadges && Array.isArray(cfg.sideBadges)) {
+    sideBadges.innerHTML = cfg.sideBadges.map((t) => `<span class="badge">${escapeHtml(t)}</span>`).join("");
+  }
 
-  // services blocks
-  const sb = $("#servicesBlocks");
-  (cfg.services || []).forEach((block) => {
-    const card = el("div", "card list");
-    const h3 = el("h3"); h3.textContent = block.title;
-    const ul = el("ul");
-    (block.items || []).forEach((it) => {
-      const li = el("li", "li");
-      const check = el("div", "check");
-      const wrap = el("div");
-      const b = el("b"); b.textContent = it.b;
-      const s = el("span"); s.textContent = it.s;
-      wrap.append(b, s);
-      li.append(check, wrap);
-      ul.appendChild(li);
+  // Hero pills
+  const heroPills = $("#heroPills");
+  if (heroPills && Array.isArray(cfg.heroPills)) {
+    heroPills.innerHTML = cfg.heroPills.map((t) => `<span class="pill">${escapeHtml(t)}</span>`).join("");
+  }
+
+  // Popular
+  const popularGrid = $("#popularGrid");
+  if (popularGrid && Array.isArray(cfg.popular)) {
+    popularGrid.innerHTML = cfg.popular.map((p) => `
+      <div class="s-card">
+        <h4>${escapeHtml(p.title || "")}</h4>
+        <p>${escapeHtml(p.text || "")}</p>
+      </div>
+    `).join("");
+  }
+
+  // Services blocks
+  const servicesBlocks = $("#servicesBlocks");
+  if (servicesBlocks && Array.isArray(cfg.services)) {
+    servicesBlocks.innerHTML = cfg.services.map((block) => `
+      <div class="card list">
+        <h3>${escapeHtml(block.title || "")}</h3>
+        <ul>
+          ${(block.items || []).map((it) => `
+            <li class="li">
+              <span class="check"></span>
+              <div>
+                <b>${escapeHtml(it.b || "")}</b>
+                <span>${escapeHtml(it.s || "")}</span>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      </div>
+    `).join("");
+  }
+
+  // How (pricing cards)
+  const howCards = $("#howCards");
+  if (howCards && Array.isArray(cfg.pricing)) {
+    howCards.innerHTML = cfg.pricing.map((p) => `
+      <div class="card plan">
+        <div class="badge" style="display:inline-flex;margin:0 0 10px">${escapeHtml(p.tag || "")}</div>
+        <h4>${escapeHtml(p.title || "")}</h4>
+        <p class="p">${escapeHtml(p.text || "")}</p>
+        <ul>
+          ${(p.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}
+        </ul>
+      </div>
+    `).join("");
+  }
+
+  // Big objects
+  const bigProcess = $("#bigProcess");
+  if (bigProcess && Array.isArray(cfg.bigProcess)) {
+    bigProcess.innerHTML = cfg.bigProcess.map((x) => `<li>${escapeHtml(x)}</li>`).join("");
+  }
+  const bigBenefits = $("#bigBenefits");
+  if (bigBenefits && Array.isArray(cfg.bigBenefits)) {
+    bigBenefits.innerHTML = cfg.bigBenefits.map((x) => `<li>${escapeHtml(x)}</li>`).join("");
+  }
+
+  // FAQ
+  const faqList = $("#faqList");
+  if (faqList && Array.isArray(cfg.faq)) {
+    faqList.innerHTML = cfg.faq.map((f) => `
+      <details>
+        <summary>${escapeHtml(f.q || "")}</summary>
+        <p>${escapeHtml(f.a || "")}</p>
+      </details>
+    `).join("");
+  }
+
+  // Service select
+  const serviceSelect = $("#serviceSelect");
+  if (serviceSelect && Array.isArray(cfg.serviceOptions)) {
+    serviceSelect.innerHTML = cfg.serviceOptions.map((s) => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
+  }
+
+  // Form submit -> Telegram / WhatsApp
+  const form = $("#leadForm");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!tg) return alert("Telegram не настроен. Проверь поле telegram в config.js");
+      const data = readForm(form);
+      const text = buildLeadText(cfg, data);
+      const url = `https://t.me/${tg}?text=${encodeURIComponent(text)}`;
+      window.open(url, "_blank");
     });
-    card.append(h3, ul);
-    sb.appendChild(card);
-  });
+  }
 
-  // pricing cards
-  const pc = $("#pricingCards");
-  (cfg.pricing || []).forEach((plan) => {
-    const card = el("div", "card plan");
-    const tag = el("span", "pill tag"); tag.textContent = plan.tag || "";
-    const h4 = el("h4"); h4.textContent = plan.title || "";
-    const p = el("p", "p"); p.textContent = plan.text || "";
-    const cost = el("div", "cost"); cost.textContent = plan.cost || "";
-    const ul = el("ul");
-    (plan.bullets || []).forEach((t) => {
-      const li = el("li"); li.textContent = t;
-      ul.appendChild(li);
+  const sendWA = $("#sendWA");
+  if (sendWA) {
+    sendWA.addEventListener("click", () => {
+      if (!wa) return alert("WhatsApp не настроен. Проверь поле whatsapp в config.js");
+      const data = form ? readForm(form) : {};
+      const text = buildLeadText(cfg, data);
+      const url = `https://wa.me/${wa.replace(/[^\d]/g, "")}?text=${encodeURIComponent(text)}`;
+      window.open(url, "_blank");
     });
-    card.append(tag, h4, p, cost, ul);
-    pc.appendChild(card);
-  });
+  }
 
-  // faq
-  const fl = $("#faqList");
-  (cfg.faq || []).forEach((x) => {
-    const d = document.createElement("details");
-    const s = document.createElement("summary");
-    s.textContent = x.q || "";
-    const p = document.createElement("p");
-    p.textContent = x.a || "";
-    d.append(s, p);
-    fl.appendChild(d);
-  });
+  function readForm(formEl) {
+    const fd = new FormData(formEl);
+    return Object.fromEntries(fd.entries());
+  }
 
-  // service select
-  const ss = $("#serviceSelect");
-  (cfg.serviceOptions || []).forEach((opt) => {
-    const o = document.createElement("option");
-    o.textContent = opt;
-    ss.appendChild(o);
-  });
-
-  // messaging
-  function buildMessage(data){
-    const lines = [
-      "Заявка на услуги кондиционера:",
-      "Имя: " + (data.name || "-"),
-      "Телефон: " + (data.phone || "-"),
-      "Услуга: " + (data.service || "-"),
-      "Район/адрес: " + (data.area || "-"),
-      "Комментарий: " + (data.comment || "-")
-    ];
+  function buildLeadText(cfg, data) {
+    const lines = [];
+    lines.push(`Заявка с сайта: ${cfg.brandName || "BreezeService"}`);
+    lines.push("");
+    if (data.name) lines.push(`Имя: ${data.name}`);
+    if (data.phone) lines.push(`Телефон: ${data.phone}`);
+    if (data.service) lines.push(`Услуга: ${data.service}`);
+    if (data.area) lines.push(`Район/адрес: ${data.area}`);
+    if (data.comment) lines.push(`Комментарий: ${data.comment}`);
+    lines.push("");
+    lines.push(`Время: ${new Date().toLocaleString("ru-RU")}`);
     return lines.join("\n");
   }
-  function toTelegram(msg){
-    if (!cfg.telegram) return;
-    const url = "https://t.me/" + cfg.telegram + "?text=" + encodeURIComponent(msg);
-    window.open(url, "_blank");
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (m) => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      "\"":"&quot;",
+      "'":"&#39;"
+    }[m]));
   }
-  function toWhatsApp(msg){
-    if (!cfg.whatsapp) return;
-    const url = "https://wa.me/" + String(cfg.whatsapp).replace(/\D/g,'') + "?text=" + encodeURIComponent(msg);
-    window.open(url, "_blank");
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/"/g, "&quot;");
   }
-
-  const form = $("#leadForm");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const fd = new FormData(form);
-    const data = Object.fromEntries(fd.entries());
-    toTelegram(buildMessage(data));
-  });
-
-  $("#sendTG").addEventListener("click", () => {
-    const fd = new FormData(form);
-    toTelegram(buildMessage(Object.fromEntries(fd.entries())));
-  });
-
-  $("#sendWA").addEventListener("click", () => {
-    const fd = new FormData(form);
-    toWhatsApp(buildMessage(Object.fromEntries(fd.entries())));
-  });
 })();
