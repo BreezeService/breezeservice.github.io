@@ -3,26 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BreezeService — кондиционеры: установка, чистка, ремонт</title>
-  <meta name="description" content="Установка, чистка, заправка фреоном и ремонт кондиционеров. Заявка в Telegram/WhatsApp. Гарантия на монтаж." />
+  <title>BreezeService — сервис кондиционеров в Ташкенте</title>
+  <meta name="description" content="BreezeService — сервис кондиционеров в Ташкенте. Установка, демонтаж, чистка, заправка фреоном, диагностика и ремонт. Быстрые заявки через Telegram/WhatsApp." />
+  <link rel="icon" href="./logo.png" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <header class="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="BreezeService">
-        <span class="logo" aria-hidden="true"></span>
+        <img class="logo-img" src="./logo.png" alt="BreezeService" />
         <span class="brand-text">
           <span class="brand-name" data-bind="brandName">BreezeService</span>
-          <span class="brand-sub" data-bind="brandSub">Установка • Чистка • Ремонт</span>
+          <span class="brand-sub" data-bind="brandSub">Сервис кондиционеров в Ташкенте</span>
         </span>
       </a>
 
       <nav class="nav-links" aria-label="Навигация">
         <a href="#services">Услуги</a>
-        <a href="#pricing">Цены</a>
+        <a href="#how">Как работаем</a>
+        <a href="#big">Крупные объекты</a>
         <a href="#faq">FAQ</a>
-        <a href="#contact">Заявка</a>
+        <a href="#contact">Контакты</a>
       </nav>
 
       <div class="nav-cta">
@@ -35,22 +37,23 @@
   <main id="top" class="wrap">
     <section class="hero">
       <div class="card hero-left">
-        <h1 data-bind="heroTitle">Кондиционер работает как надо — без шума, запаха и потёков</h1>
+        <div class="hero-kicker" data-bind="heroKicker">Сервис кондиционеров • Ташкент</div>
+        <h1 data-bind="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
         <p class="lead" data-bind="heroLead">
-          Установка, чистка, заправка фреоном и ремонт. Приезжаем вовремя, делаем аккуратно, после работы — чисто.
+          Один звонок — чёткая консультация — выезд мастера без лишних сложностей. От чистки до установки и ремонта.
         </p>
 
         <div class="pill-row" id="heroPills"></div>
 
         <div class="hero-cta">
-          <a class="btn primary" href="#contact" data-bind="heroPrimaryCta">Рассчитать стоимость</a>
-          <a class="btn" id="tgBtn" href="#">Написать в Telegram</a>
+          <a class="btn primary" href="#contact" data-bind="heroPrimaryCta">Оставить заявку</a>
+          <a class="btn" id="tgBtn" href="#">Telegram</a>
           <a class="btn" id="waBtn" href="#">WhatsApp</a>
         </div>
 
         <div class="mini">
-          <span><i class="dot ok"></i><span data-bind="mini1">Гарантия на монтаж</span></span>
-          <span><i class="dot warn"></i><span data-bind="mini2">Выезд в день обращения (если есть окно)</span></span>
+          <span><i class="dot ok"></i><span data-bind="mini1">Гарантия на установку — 1 год</span></span>
+          <span><i class="dot warn"></i><span data-bind="mini2">Консультация перед выездом</span></span>
         </div>
       </div>
 
@@ -61,44 +64,71 @@
         </div>
 
         <div class="card inset">
-          <h3>Цены от</h3>
+          <h3>Стоимость</h3>
           <div class="price" id="fromPrice">—</div>
           <div class="badges" id="badges"></div>
+          <div class="muted small" data-bind="priceHint">Перед выездом — предварительная консультация по телефону.</div>
         </div>
       </aside>
     </section>
 
     <section id="services">
       <div class="section-title">
-        <h2 data-bind="servicesTitle">Услуги</h2>
-        <p data-bind="servicesLead">Выбирай нужное — или оставь заявку, и мы подскажем лучший вариант под твою ситуацию.</p>
+        <h2 data-bind="servicesTitle">Чем мы занимаемся</h2>
+        <p data-bind="servicesLead">Полный спектр услуг по кондиционерам: от простой чистки до установки и ремонта.</p>
       </div>
 
       <div class="two" id="servicesBlocks"></div>
+
+      <div class="card note-block">
+        <h3 data-bind="brandsTitle">Работаем со всеми марками</h3>
+        <p class="muted" data-bind="brandsText">
+          Обслуживаем бытовые и полупромышленные кондиционеры любых брендов и моделей.
+        </p>
+      </div>
     </section>
 
-    <section id="pricing">
+    <section id="how">
       <div class="section-title">
-        <h2 data-bind="pricingTitle">Цены</h2>
-        <p data-bind="pricingLead">Финальная стоимость зависит от модели, длины трассы и доступа. Сначала согласуем — потом делаем.</p>
+        <h2 data-bind="howTitle">Как мы работаем</h2>
+        <p data-bind="howLead">BreezeService — это организованный сервис: заявка → мастер → работа → оплата по факту.</p>
       </div>
 
-      <div class="pricing" id="pricingCards"></div>
-      <p class="note" data-bind="pricingNote">*Цены ориентировочные. Точную стоимость скажем после уточнений/фото.</p>
+      <div class="pricing" id="howCards"></div>
+    </section>
+
+    <section id="big">
+      <div class="section-title">
+        <h2 data-bind="bigTitle">Крупные объекты</h2>
+        <p data-bind="bigLead">Офисы, магазины, коммерческие помещения и дома с несколькими кондиционерами.</p>
+      </div>
+
+      <div class="card big-card">
+        <div class="big-grid">
+          <div>
+            <h3 data-bind="bigLeftTitle">Как это происходит</h3>
+            <ul class="muted list-bullets" id="bigProcess"></ul>
+          </div>
+          <div>
+            <h3 data-bind="bigRightTitle">Почему это удобно</h3>
+            <ul class="muted list-bullets" id="bigBenefits"></ul>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="faq">
       <div class="section-title">
-        <h2 data-bind="faqTitle">FAQ</h2>
-        <p data-bind="faqLead">Коротко и по делу — чтобы сразу снять вопросы.</p>
+        <h2 data-bind="faqTitle">Гарантии и ответственность</h2>
+        <p data-bind="faqLead">Мы всегда на связи и помогаем решить вопросы спокойно и по делу.</p>
       </div>
       <div class="faq" id="faqList"></div>
     </section>
 
     <section id="contact">
       <div class="section-title">
-        <h2 data-bind="contactTitle">Заявка</h2>
-        <p data-bind="contactLead">Заполни форму — и мы ответим в ближайшее время. Можно сразу отправить заявку в мессенджер.</p>
+        <h2 data-bind="contactTitle">Контакты и заявка</h2>
+        <p data-bind="contactLead">Позвоните или напишите — отвечаем максимально быстро и подберём удобное время.</p>
       </div>
 
       <div class="contact">
@@ -114,37 +144,37 @@
             </div>
           </div>
 
-          <label>Услуга</label>
+          <label>Что нужно сделать</label>
           <select name="service" id="serviceSelect"></select>
 
-          <label>Адрес / район</label>
-          <input name="area" placeholder="Город, район (можно без точного адреса)" />
+          <label>Район / адрес</label>
+          <input name="area" placeholder="Ташкент, район (можно без точного адреса)" />
 
           <label>Комментарий</label>
           <textarea name="comment" placeholder="Например: не холодит, капает, запах, нужна установка 12-ки..."></textarea>
 
           <div class="hero-cta" style="margin-top:14px">
-            <button class="btn primary" type="submit">Отправить</button>
-            <button class="btn" type="button" id="sendTG">В Telegram</button>
-            <button class="btn" type="button" id="sendWA">В WhatsApp</button>
+            <button class="btn primary" type="submit">Отправить в Telegram</button>
+            <button class="btn" type="button" id="sendWA">Отправить в WhatsApp</button>
           </div>
 
-          <p class="note">Нажимая “Отправить”, ты отправляешь данные в мессенджер. Базу/CRM можно подключить позже.</p>
+          <p class="note">Нажимая “Отправить”, вы отправляете данные в мессенджер. CRM/таблицу можно подключить позже.</p>
         </form>
 
         <div class="card side">
-          <h3 style="margin:0 0 8px">Контакты</h3>
+          <h3 style="margin:0 0 8px" data-bind="contactsBoxTitle">Контакты</h3>
           <p class="muted">
             <b>Телефон:</b> <span id="phoneText">—</span><br/>
+            <b>График:</b> <span data-bind="hours">—</span><br/>
+            <b>География:</b> <span data-bind="areas">—</span><br/>
             <b>Telegram:</b> <span id="tgText">—</span><br/>
-            <b>Районы:</b> <span data-bind="areas">Ташкент</span><br/>
-            <b>График:</b> <span data-bind="hours">ежедневно 09:00–21:00</span>
+            <b>WhatsApp:</b> <span id="waText">—</span>
           </p>
 
           <div class="badges" id="sideBadges"></div>
 
-          <div class="muted" style="margin-top:14px;font-size:13px">
-            Хочешь — добавим фотогалерею “до/после”, карту и отдельные страницы услуг.
+          <div class="muted small" style="margin-top:14px" data-bind="contactNote">
+            Мы не обещаем невозможного — делаем то, что умеем, качественно и вовремя.
           </div>
         </div>
       </div>
