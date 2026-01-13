@@ -5,7 +5,7 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // Bind simple text
+  // Bind text
   $$("[data-bind]").forEach((el) => {
     const key = el.getAttribute("data-bind");
     if (cfg[key] != null) el.textContent = cfg[key];
@@ -15,7 +15,7 @@
   const y = $("#year");
   if (y) y.textContent = new Date().getFullYear();
 
-  // Phone / messengers
+  // Phone/messengers
   const phone = (cfg.phone || "").replace(/\s+/g, "");
   const phonePretty = cfg.phonePretty || cfg.phone || "";
   const tg = cfg.telegram || "";
@@ -36,13 +36,12 @@
   const waBtn = $("#waBtn");
   if (waBtn && waDigits) waBtn.href = `https://wa.me/${waDigits}`;
 
-  // Bottom bar quick actions
   const bbCall = $("#bbCall");
   if (bbCall && phone) bbCall.href = `tel:${phone}`;
   const bbTg = $("#bbTg");
   if (bbTg && tg) bbTg.href = `https://t.me/${tg}`;
 
-  // Hero pills
+  // Pills
   const heroPills = $("#heroPills");
   if (heroPills && Array.isArray(cfg.heroPills)) {
     heroPills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
@@ -69,7 +68,7 @@
   renderTags("#badges", cfg.badges);
   renderTags("#sideBadges", cfg.sideBadges);
 
-  // Services blocks
+  // Services
   const servicesBlocks = $("#servicesBlocks");
   if (servicesBlocks && Array.isArray(cfg.services)) {
     servicesBlocks.innerHTML = cfg.services.map(block => `
@@ -90,7 +89,7 @@
     `).join("");
   }
 
-  // Pricing cards
+  // Pricing
   const pricingCards = $("#pricingCards");
   if (pricingCards && Array.isArray(cfg.pricing)) {
     pricingCards.innerHTML = cfg.pricing.map(p => `
@@ -113,13 +112,13 @@
     `).join("");
   }
 
-  // Select options
+  // Select
   const sel = $("#serviceSelect");
   if (sel && Array.isArray(cfg.serviceOptions)) {
     sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
   }
 
-  // Form
+  // Form -> TG/WA
   const form = $("#leadForm");
   if (form) {
     form.addEventListener("submit", (e) => {
