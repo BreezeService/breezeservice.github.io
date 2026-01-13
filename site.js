@@ -5,7 +5,7 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // bind text
+  // bind text nodes
   $$("[data-bind]").forEach((el) => {
     const key = el.getAttribute("data-bind");
     if (cfg[key] != null) el.textContent = cfg[key];
@@ -16,12 +16,12 @@
   if (y) y.textContent = new Date().getFullYear();
 
   // contacts
-  const phoneRaw = (cfg.phone || "").replace(/\s+/g, "");
+  const phoneRaw = String(cfg.phone || "").replace(/\s+/g, "");
   const phonePretty = cfg.phonePretty || cfg.phone || "";
-  const tg = (cfg.telegram || "").trim();
+  const tg = String(cfg.telegram || "").trim();
+  const ig = String(cfg.instagram || "").trim();
   const waDigits = String(cfg.whatsapp || "").replace(/[^\d]/g, "");
 
-  // helper
   const setHref = (sel, href) => { const el = $(sel); if (el) el.href = href; };
 
   // call => phone app
@@ -43,13 +43,16 @@
     const w = $("#waText"); if (w) w.textContent = `+${waDigits}`;
   }
 
+  // instagram
+  if (ig) {
+    setHref("#igBtn", `https://instagram.com/${ig}`);
+    const i = $("#igText"); if (i) i.textContent = `@${ig}`;
+  }
+
   const p = $("#phoneText"); if (p) p.textContent = phonePretty || "—";
 
-  // pills
-  const pills = $("#heroPills");
-  if (pills && Array.isArray(cfg.heroPills)) {
-    pills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
-  }
+  // HERO service chips
+  renderChipsRow("#heroServiceChips", cfg.heroServices);
 
   // popular tiles
   const pop = $("#popularGrid");
@@ -66,8 +69,8 @@
   const from = $("#fromPrice"); if (from) from.textContent = cfg.fromPrice || "—";
   const hint = $("#priceHint"); if (hint) hint.textContent = cfg.priceHint || "";
 
-  renderChips("#badges", cfg.badges);
-  renderChips("#sideBadges", cfg.sideBadges);
+  renderTagChips("#badges", cfg.badges);
+  renderTagChips("#sideBadges", cfg.sideBadges);
 
   // services blocks
   const services = $("#servicesBlocks");
@@ -102,21 +105,34 @@
     `).join("");
   }
 
-  // faq
+  // faq (animated container)
   const faq = $("#faqList");
   if (faq && Array.isArray(cfg.faq)) {
     faq.innerHTML = cfg.faq.map(f => `
       <details>
         <summary>${esc(f.q || "")}</summary>
-        <p>${esc(f.a || "")}</p>
+        <div class="faq-a"><p>${esc(f.a || "")}</p></div>
       </details>
     `).join("");
   }
 
-  // select
-  const sel = $("#serviceSelect");
-  if (sel && Array.isArray(cfg.serviceOptions)) {
-    sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+  // service chips in form
+  const chipsWrap = $("#serviceChips");
+  const serviceHidden = $("#serviceHidden");
+  if (chipsWrap && serviceHidden && Array.isArray(cfg.serviceOptions)) {
+    chipsWrap.innerHTML = cfg.serviceOptions.map((s, idx) =>
+      `<button type="button" class="seg-chip${idx===0 ? " active" : ""}" data-val="${esc(s)}">${esc(s)}</button>`
+    ).join("");
+
+    serviceHidden.value = cfg.serviceOptions[0] || "";
+
+    chipsWrap.addEventListener("click", (e) => {
+      const btn = e.target.closest(".seg-chip");
+      if (!btn) return;
+      chipsWrap.querySelectorAll(".seg-chip").forEach(x => x.classList.remove("active"));
+      btn.classList.add("active");
+      serviceHidden.value = btn.getAttribute("data-val") || "";
+    });
   }
 
   // form -> TG/WA
@@ -141,8 +157,8 @@
     });
   }
 
-  // ✅ Fix anchor scroll under sticky nav + smooth iOS-like easing
-  const NAV_OFFSET = 104; // slightly more than nav height for safe space
+  // Smooth scroll with offset (prevents "cut text" under sticky nav)
+  const NAV_OFFSET = 104;
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener("click", (e) => {
       const id = a.getAttribute("href");
@@ -153,16 +169,21 @@
 
       e.preventDefault();
       const y = target.getBoundingClientRect().top + window.pageYOffset - NAV_OFFSET;
-
       window.scrollTo({ top: y, behavior: "smooth" });
       history.pushState(null, "", id);
     });
   });
 
-  function renderChips(sel, arr){
+  function renderTagChips(sel, arr){
     const el = $(sel);
     if (!el || !Array.isArray(arr)) return;
     el.innerHTML = arr.map(t => `<span class="chip2">${esc(t)}</span>`).join("");
+  }
+
+  function renderChipsRow(sel, arr){
+    const el = $(sel);
+    if (!el || !Array.isArray(arr)) return;
+    el.innerHTML = arr.map(t => `<span class="seg-chip" style="pointer-events:none">${esc(t)}</span>`).join("");
   }
 
   function buildText(cfg, d){
@@ -183,3 +204,4 @@
     }[m]));
   }
 })();
+;
