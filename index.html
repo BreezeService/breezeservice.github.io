@@ -6,9 +6,9 @@
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
   <meta name="description" content="Установка, чистка, ремонт, диагностика и заправка фреоном кондиционеров в Ташкенте." />
 
-  <!-- cache-buster: increase number when updates don't show -->
-  <link rel="icon" href="./logo.png?v=6001" />
-  <link rel="stylesheet" href="./styles.css?v=6001" />
+  <!-- bump v=6002 when not updating -->
+  <link rel="icon" href="./logo.png?v=6002" />
+  <link rel="stylesheet" href="./styles.css?v=6002" />
 </head>
 
 <body id="top">
@@ -16,7 +16,7 @@
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="BreezeService">
         <span class="logo-shell">
-          <img class="logo" src="./logo.png?v=6001" alt="BreezeService">
+          <img class="logo" src="./logo.png?v=6002" alt="BreezeService">
         </span>
         <span class="brand-text">
           <span class="brand-name" data-bind="brandName">BreezeService</span>
@@ -31,37 +31,32 @@
         <a href="#contact" class="nav-pill strong">Заявка</a>
       </nav>
 
-      <!-- desktop only (hidden on mobile via CSS) -->
       <div class="nav-cta">
-        <a class="btn glass" id="callBtn" href="tel:+998910094469">Позвонить</a>
+        <a class="btn" id="callBtn" href="tel:+998910094469">Позвонить</a>
         <a class="btn primary" href="#contact">Заявка</a>
       </div>
     </div>
   </header>
 
   <main class="wrap">
-    <!-- HERO -->
     <section class="hero section" id="hero">
       <div class="card glass hero-main">
         <div class="kicker" data-bind="heroKicker">Ташкент • климат-сервис</div>
         <h1 data-bind="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
-        <p class="lead" data-bind="heroLead">
-          Помогаем частным клиентам и объектам любого масштаба: от чистки до установки и ремонта. Один звонок — консультация — выезд мастера без лишних сложностей.
-        </p>
+        <p class="lead" data-bind="heroLead"></p>
 
-        <!-- iOS-like quick service chips -->
-        <div class="segmented glass" id="heroServiceChips" aria-label="Популярные услуги"></div>
+        <div class="segmented" id="heroServiceChips" aria-label="Популярные услуги"></div>
 
         <div class="hero-actions">
           <a class="btn primary" href="#contact">Оставить заявку</a>
-          <a class="btn glass" id="tgBtn" href="#">Telegram</a>
-          <a class="btn glass" id="waBtn" href="#">WhatsApp</a>
-          <a class="btn glass" id="igBtn" href="#">Instagram</a>
+          <a class="btn" id="tgBtn" href="#">Telegram</a>
+          <a class="btn" id="waBtn" href="#">WhatsApp</a>
+          <a class="btn" id="igBtn" href="#">Instagram</a>
         </div>
 
         <div class="mini">
-          <span><span class="dot ok"></span><span data-bind="mini1">Гарантия на установку — 1 год</span></span>
-          <span><span class="dot warn"></span><span data-bind="mini2">Оплата по факту выполненной работы</span></span>
+          <span><span class="dot ok"></span><span data-bind="mini1"></span></span>
+          <span><span class="dot warn"></span><span data-bind="mini2"></span></span>
         </div>
       </div>
 
@@ -86,43 +81,39 @@
       </aside>
     </section>
 
-    <!-- SERVICES -->
     <section id="services" class="section anchor">
       <div class="section-title">
         <h2 data-bind="servicesTitle">Услуги</h2>
-        <p data-bind="servicesLead">Полный спектр работ по кондиционерам.</p>
+        <p data-bind="servicesLead"></p>
       </div>
       <div class="grid-2" id="servicesBlocks"></div>
     </section>
 
-    <!-- PRICING -->
     <section id="pricing" class="section anchor">
       <div class="section-title">
         <h2 data-bind="pricingTitle">Цены</h2>
-        <p data-bind="pricingLead">Стоимость не фиксирована — зависит от условий и объёма.</p>
+        <p data-bind="pricingLead"></p>
       </div>
       <div class="grid-3" id="pricingCards"></div>
 
       <div class="card glass note">
         <span class="note-badge">Важно</span>
-        <div class="muted" data-bind="pricingNote">Перед выездом вы всегда получаете предварительную консультацию по телефону.</div>
+        <div class="muted" data-bind="pricingNote"></div>
       </div>
     </section>
 
-    <!-- FAQ -->
     <section id="faq" class="section anchor">
       <div class="section-title">
         <h2 data-bind="faqTitle">FAQ</h2>
-        <p data-bind="faqLead">Ответы на частые вопросы.</p>
+        <p data-bind="faqLead"></p>
       </div>
       <div class="faq" id="faqList"></div>
     </section>
 
-    <!-- CONTACT -->
     <section id="contact" class="section anchor">
       <div class="section-title">
         <h2 data-bind="contactTitle">Заявка</h2>
-        <p data-bind="contactLead">Заполни форму — откроем мессенджер с готовым текстом.</p>
+        <p data-bind="contactLead"></p>
       </div>
 
       <div class="contact">
@@ -140,7 +131,7 @@
 
           <label>Услуга</label>
           <input type="hidden" name="service" id="serviceHidden" value="">
-          <div class="segmented glass" id="serviceChips"></div>
+          <div class="segmented" id="serviceChips"></div>
 
           <label>Район / адрес</label>
           <input name="area" placeholder="Ташкент, район (примерно)">
@@ -150,7 +141,7 @@
 
           <div class="actions">
             <button class="btn primary" type="submit">Отправить в Telegram</button>
-            <button class="btn glass" type="button" id="sendWA">Отправить в WhatsApp</button>
+            <button class="btn" type="button" id="sendWA">Отправить в WhatsApp</button>
           </div>
 
           <p class="footnote">Нажимая кнопку, вы отправляете данные в мессенджер.</p>
@@ -174,15 +165,13 @@
     </footer>
   </main>
 
-  <!-- mobile bottom actions -->
   <div class="bottom-bar" aria-label="Быстрые действия">
-    <a class="bb glass" id="bbCall" href="tel:+998910094469">Позвонить</a>
-    <a class="bb glass" id="bbTg" href="#">Telegram</a>
+    <a class="bb" id="bbCall" href="tel:+998910094469">Позвонить</a>
+    <a class="bb" id="bbTg" href="#">Telegram</a>
     <a class="bb primary" href="#contact">Заявка</a>
   </div>
 
-  <!-- IMPORTANT: config first -->
-  <script src="./config.js?v=6001"></script>
-  <script src="./site.js?v=6001"></script>
+  <script src="./config.js?v=6002"></script>
+  <script src="./site.js?v=6002"></script>
 </body>
-</html></html>
+</html>
