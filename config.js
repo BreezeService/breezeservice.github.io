@@ -1,172 +1,96 @@
-(() => {
-  try {
-    const cfg = window.SITE_CONFIG;
-    if (!cfg) {
-      console.error("SITE_CONFIG not found. Check config.js and script order.");
-      return;
+window.SITE_CONFIG = {
+  brandName: "BreezeService",
+  brandSub: "Сервис кондиционеров в Ташкенте",
+
+  phone: "+998910094469",
+  phonePretty: "+998 91 009 44 69",
+  telegram: "breezeservice",
+  whatsapp: "+998910094469",
+
+  areas: "Ташкент • выезд за город до 1–2 км — по договорённости",
+  hours: "Звонки: 10:00–18:00",
+
+  heroKicker: "Ташкент • Климат-сервис",
+  heroTitle: "BreezeService — сервис кондиционеров в Ташкенте",
+  heroLead:
+    "Помогаем быстро решать проблемы с климатической техникой: от простой чистки до установки и ремонта. Один звонок — консультация — выезд мастера без лишних сложностей.",
+
+  heroPrimaryCta: "Оставить заявку",
+  heroPills: ["Установка", "Чистка", "Ремонт", "Заправка фреоном", "Диагностика"],
+
+  mini1: "Гарантия на установку — 1 год",
+  mini2: "Оплата по факту выполненной работы",
+
+  popular: [
+    { title: "Установка", text: "Монтаж бытовых и полупромышленных кондиционеров." },
+    { title: "Чистка", text: "Внутренние и наружные блоки, устранение запахов." },
+    { title: "Ремонт", text: "Диагностика и устранение неисправностей." }
+  ],
+
+  fromPrice: "Цена зависит от объёма работ",
+  priceHint: "Сложность, количество кондиционеров, условия монтажа, состояние оборудования.",
+
+  badges: ["500+ клиентов", "Проверенные мастера", "Без навязывания услуг"],
+  sideBadges: ["Быстрый отклик", "Поддержка на этапах", "Понятная схема"],
+
+  servicesTitle: "Услуги",
+  servicesLead: "Работаем со всеми марками и моделями — бытовыми и полупромышленными.",
+
+  services: [
+    {
+      title: "Основные работы",
+      items: [
+        { b: "Установка", s: "монтаж сплит-систем" },
+        { b: "Демонтаж", s: "аккуратно и безопасно" },
+        { b: "Чистка", s: "внутренние/наружные блоки" },
+        { b: "Заправка фреоном", s: "по состоянию системы" }
+      ]
+    },
+    {
+      title: "Диагностика и ремонт",
+      items: [
+        { b: "Диагностика", s: "находим причину" },
+        { b: "Ремонт", s: "по согласованию" },
+        { b: "Профилактика", s: "чтобы работало стабильно" }
+      ]
     }
+  ],
 
-    const $ = (s) => document.querySelector(s);
-    const $$ = (s) => Array.from(document.querySelectorAll(s));
+  pricingTitle: "Цены",
+  pricingLead: "Не фиксированы — зависят от условий.",
+  pricingNote: "Перед выездом вы получаете предварительную консультацию по телефону.",
 
-    // Bind text
-    $$("[data-bind]").forEach((el) => {
-      const key = el.getAttribute("data-bind");
-      if (cfg[key] != null) el.textContent = cfg[key];
-    });
-
-    // Year
-    const y = $("#year");
-    if (y) y.textContent = new Date().getFullYear();
-
-    // Phone / messengers
-    const phone = (cfg.phone || "").replace(/\s+/g, "");
-    const phonePretty = cfg.phonePretty || cfg.phone || "";
-    const tg = cfg.telegram || "";
-    const waDigits = String(cfg.whatsapp || "").replace(/[^\d]/g, "");
-
-    if ($("#phoneText")) $("#phoneText").textContent = phonePretty || "—";
-    if ($("#tgText")) $("#tgText").textContent = tg ? `@${tg}` : "—";
-    if ($("#waText")) $("#waText").textContent = waDigits ? `+${waDigits}` : "—";
-
-    if ($("#callBtn") && phone) $("#callBtn").href = `tel:${phone}`;
-    if ($("#tgBtn") && tg) $("#tgBtn").href = `https://t.me/${tg}`;
-    if ($("#waBtn") && waDigits) $("#waBtn").href = `https://wa.me/${waDigits}`;
-
-    // Price
-    if ($("#fromPrice")) $("#fromPrice").textContent = cfg.fromPrice || "—";
-    if ($("#priceHint")) $("#priceHint").textContent = cfg.priceHint || "";
-
-    // Badges
-    renderTags("#badges", cfg.badges);
-    renderTags("#sideBadges", cfg.sideBadges);
-
-    // Hero pills
-    const pills = $("#heroPills");
-    if (pills && Array.isArray(cfg.heroPills)) {
-      pills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
+  pricing: [
+    {
+      title: "Чистка",
+      text: "Для устранения запахов и падения мощности.",
+      bullets: ["Внутренний/наружный блок", "Проверка работы", "Рекомендации"]
+    },
+    {
+      title: "Установка",
+      text: "Монтаж с аккуратным креплением и проверкой.",
+      bullets: ["Подбор решения", "Проверка запуска", "Гарантия на монтаж 1 год"]
+    },
+    {
+      title: "Ремонт/Диагностика",
+      text: "Когда не холодит, шумит, капает или выдаёт ошибку.",
+      bullets: ["Диагностика", "Согласование цены", "Ремонт по факту"]
     }
+  ],
 
-    // Popular
-    const popular = $("#popularGrid");
-    if (popular && Array.isArray(cfg.popular)) {
-      popular.innerHTML = cfg.popular.map(p => `
-        <div class="s-card">
-          <h4>${esc(p.title || "")}</h4>
-          <p>${esc(p.text || "")}</p>
-        </div>
-      `).join("");
-    }
+  faqTitle: "FAQ",
+  faqLead: "Гарантии и частые вопросы.",
 
-    // Services
-    const blocks = $("#servicesBlocks");
-    if (blocks && Array.isArray(cfg.services)) {
-      blocks.innerHTML = cfg.services.map(b => `
-        <div class="card list">
-          <h3>${esc(b.title || "")}</h3>
-          <ul>
-            ${(b.items || []).map(it => `
-              <li class="li">
-                <span class="check"></span>
-                <div>
-                  <b>${esc(it.b || "")}</b>
-                  <span>${esc(it.s || "")}</span>
-                </div>
-              </li>
-            `).join("")}
-          </ul>
-        </div>
-      `).join("");
-    }
+  faq: [
+    { q: "Какая гарантия?", a: "На установку — 1 год. На другие работы гарантию даёт мастер, выполнявший заказ." },
+    { q: "Как формируется цена?", a: "Зависит от сложности, количества кондиционеров, условий монтажа и состояния оборудования." },
+    { q: "Работаете с крупными объектами?", a: "Да. Делаем оценку, смету и при необходимости выезжает несколько мастеров." }
+  ],
 
-    // How cards
-    const how = $("#howCards");
-    if (how && Array.isArray(cfg.pricing)) {
-      how.innerHTML = cfg.pricing.map(p => `
-        <div class="card plan">
-          <span class="badge" style="display:inline-flex;margin:0 0 10px">${esc(p.tag || "")}</span>
-          <h4>${esc(p.title || "")}</h4>
-          <p class="p">${esc(p.text || "")}</p>
-          <ul>${(p.bullets || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-        </div>
-      `).join("");
-    }
+  contactTitle: "Заявка",
+  contactLead: "Заполни форму — откроем мессенджер с готовым текстом.",
 
-    // Big lists
-    renderList("#bigProcess", cfg.bigProcess);
-    renderList("#bigBenefits", cfg.bigBenefits);
+  contactNote: "Мы не обещаем невозможного — делаем качественно и вовремя.",
 
-    // FAQ
-    const faq = $("#faqList");
-    if (faq && Array.isArray(cfg.faq)) {
-      faq.innerHTML = cfg.faq.map(f => `
-        <details>
-          <summary>${esc(f.q || "")}</summary>
-          <p>${esc(f.a || "")}</p>
-        </details>
-      `).join("");
-    }
-
-    // Select
-    const sel = $("#serviceSelect");
-    if (sel && Array.isArray(cfg.serviceOptions)) {
-      sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-    }
-
-    // Form -> Telegram/WhatsApp
-    const form = $("#leadForm");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!tg) return alert("Telegram не настроен в config.js");
-        const data = Object.fromEntries(new FormData(form).entries());
-        const text = buildText(cfg, data);
-        window.open(`https://t.me/${tg}?text=${encodeURIComponent(text)}`, "_blank");
-      });
-    }
-
-    const sendWA = $("#sendWA");
-    if (sendWA) {
-      sendWA.addEventListener("click", () => {
-        if (!waDigits) return alert("WhatsApp не настроен в config.js");
-        const data = form ? Object.fromEntries(new FormData(form).entries()) : {};
-        const text = buildText(cfg, data);
-        window.open(`https://wa.me/${waDigits}?text=${encodeURIComponent(text)}`, "_blank");
-      });
-    }
-
-    console.log("BreezeService OK: config loaded and applied.");
-  } catch (err) {
-    console.error("Site JS crashed:", err);
-  }
-
-  function renderTags(sel, arr){
-    const el = document.querySelector(sel);
-    if (!el || !Array.isArray(arr)) return;
-    el.innerHTML = arr.map(t => `<span class="badge">${esc(t)}</span>`).join("");
-  }
-
-  function renderList(sel, arr){
-    const el = document.querySelector(sel);
-    if (!el || !Array.isArray(arr)) return;
-    el.innerHTML = arr.map(x => `<li>${esc(x)}</li>`).join("");
-  }
-
-  function buildText(cfg, d){
-    return [
-      `Заявка с сайта: ${cfg.brandName || "BreezeService"}`,
-      "",
-      d.name ? `Имя: ${d.name}` : null,
-      d.phone ? `Телефон: ${d.phone}` : null,
-      d.service ? `Услуга: ${d.service}` : null,
-      d.area ? `Район/адрес: ${d.area}` : null,
-      d.comment ? `Комментарий: ${d.comment}` : null
-    ].filter(Boolean).join("\n");
-  }
-
-  function esc(s){
-    return String(s).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
-  }
-})();
+  serviceOptions: ["Установка","Демонтаж","Чистка","Заправка фреоном","Диагностика","Ремонт","Профилактика","Крупный объект"]
+};
