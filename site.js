@@ -36,13 +36,19 @@
   const waBtn = $("#waBtn");
   if (waBtn && waDigits) waBtn.href = `https://wa.me/${waDigits}`;
 
+  // Bottom bar quick actions
+  const bbCall = $("#bbCall");
+  if (bbCall && phone) bbCall.href = `tel:${phone}`;
+  const bbTg = $("#bbTg");
+  if (bbTg && tg) bbTg.href = `https://t.me/${tg}`;
+
   // Hero pills
   const heroPills = $("#heroPills");
   if (heroPills && Array.isArray(cfg.heroPills)) {
     heroPills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
   }
 
-  // Popular cards
+  // Popular
   const popularGrid = $("#popularGrid");
   if (popularGrid && Array.isArray(cfg.popular)) {
     popularGrid.innerHTML = cfg.popular.map(p => `
@@ -56,7 +62,6 @@
   // Price
   const fromPrice = $("#fromPrice");
   if (fromPrice) fromPrice.textContent = cfg.fromPrice || "—";
-
   const priceHint = $("#priceHint");
   if (priceHint) priceHint.textContent = cfg.priceHint || "";
 
@@ -114,7 +119,7 @@
     sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
   }
 
-  // Form -> Telegram/WhatsApp
+  // Form
   const form = $("#leadForm");
   if (form) {
     form.addEventListener("submit", (e) => {
