@@ -1,10 +1,11 @@
-(function () {
-  const cfg = window.SITE_CONFIG || {};
+(() => {
+  const cfg = window.SITE_CONFIG;
+  if (!cfg) return;
 
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // Bind simple text nodes
+  // Text binds
   $$("[data-bind]").forEach((el) => {
     const key = el.getAttribute("data-bind");
     if (cfg[key] != null) el.textContent = cfg[key];
@@ -14,77 +15,58 @@
   const y = $("#year");
   if (y) y.textContent = new Date().getFullYear();
 
-  // Phone / messenger links
-  const phone = cfg.phone || "";
-  const phonePretty = cfg.phonePretty || phone;
+  // Phone & messengers
+  const phone = (cfg.phone || "").replace(/\s+/g, "");
+  const phonePretty = cfg.phonePretty || cfg.phone || "";
   const tg = cfg.telegram || "";
-  const wa = cfg.whatsapp || "";
+  const wa = (cfg.whatsapp || "").replace(/[^\d]/g, "");
 
-  const phoneText = $("#phoneText");
-  if (phoneText) phoneText.textContent = phonePretty;
+  if ($("#phoneText")) $("#phoneText").textContent = phonePretty;
+  if ($("#tgText")) $("#tgText").textContent = tg ? `@${tg}` : "—";
+  if ($("#waText")) $("#waText").textContent = wa ? `+${wa}` : "—";
 
-  const tgText = $("#tgText");
-  if (tgText) tgText.textContent = tg ? `@${tg}` : "—";
+  if ($("#callBtn") && phone) $("#callBtn").href = `tel:${phone}`;
+  if ($("#tgBtn") && tg) $("#tgBtn").href = `https://t.me/${tg}`;
+  if ($("#waBtn") && wa) $("#waBtn").href = `https://wa.me/${wa}`;
 
-  const waText = $("#waText");
-  if (waText) waText.textContent = wa ? wa.replace(/(\+998)(\d{2})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3-$4-$5") : "—";
+  // Price
+  if ($("#fromPrice")) $("#fromPrice").textContent = cfg.fromPrice || "—";
+  if ($("#priceHint")) $("#priceHint").textContent = cfg.priceHint || "";
 
-  const callBtn = $("#callBtn");
-  if (callBtn && phone) callBtn.href = `tel:${phone.replace(/\s+/g, "")}`;
+  // Badges
+  renderTags("#badges", cfg.badges);
+  renderTags("#sideBadges", cfg.sideBadges);
 
-  const tgBtn = $("#tgBtn");
-  if (tgBtn && tg) tgBtn.href = `https://t.me/${tg}`;
-
-  const waBtn = $("#waBtn");
-  if (waBtn && wa) waBtn.href = `https://wa.me/${wa.replace(/[^\d]/g, "")}`;
-
-  // Price + badges
-  const fromPrice = $("#fromPrice");
-  if (fromPrice) fromPrice.textContent = cfg.fromPrice || "—";
-
-  const priceHint = $("#priceHint");
-  if (priceHint) priceHint.textContent = cfg.priceHint || "";
-
-  const badges = $("#badges");
-  if (badges && Array.isArray(cfg.badges)) {
-    badges.innerHTML = cfg.badges.map((t) => `<span class="badge">${escapeHtml(t)}</span>`).join("");
-  }
-
-  const sideBadges = $("#sideBadges");
-  if (sideBadges && Array.isArray(cfg.sideBadges)) {
-    sideBadges.innerHTML = cfg.sideBadges.map((t) => `<span class="badge">${escapeHtml(t)}</span>`).join("");
-  }
-
-  // Hero pills
+  // Pills
   const heroPills = $("#heroPills");
   if (heroPills && Array.isArray(cfg.heroPills)) {
-    heroPills.innerHTML = cfg.heroPills.map((t) => `<span class="pill">${escapeHtml(t)}</span>`).join("");
+    heroPills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
   }
 
   // Popular
-  const popularGrid = $("#popularGrid");
-  if (popularGrid && Array.isArray(cfg.popular)) {
-    popularGrid.innerHTML = cfg.popular.map((p) => `
+  const popular = $("#popularGrid");
+  if (popular && Array.isArray(cfg.popular)) {
+    popular.innerHTML = cfg.popular.map(p => `
       <div class="s-card">
-        <h4>${escapeHtml(p.title || "")}</h4>
-        <p>${escapeHtml(p.text || "")}</p>
+        <h4>${esc(p.title || "")}</h4>
+        <p>${esc(p.text || "")}</p>
       </div>
     `).join("");
   }
 
   // Services blocks
-  const servicesBlocks = $("#servicesBlocks");
-  if (servicesBlocks && Array.isArray(cfg.services)) {
-    servicesBlocks.innerHTML = cfg.services.map((block) => `
+  const blocks = $("#servicesBlocks");
+  if (blocks && Array.isArray(cfg.services)) {
+    blocks.innerHTML = cfg.services.map(b => `
       <div class="card list">
-        <h3>${escapeHtml(block.title || "")}</h3>
+        <h3>${esc(b.title || "")}</h3>
         <ul>
-          ${(block.items || []).map((it) => `
+          ${(b.items || []).map(it => `
             <li class="li">
               <span class="check"></span>
               <div>
-                <b>${escapeHtml(it.b || "")}</b>
-                <span>${escapeHtml(it.s || "")}</span>
+                <b>${esc(it.b || "")}</b>
+                <span>${esc(it.s || "")}</span>
               </div>
             </li>
           `).join("")}
@@ -93,101 +75,90 @@
     `).join("");
   }
 
-  // How (pricing cards)
-  const howCards = $("#howCards");
-  if (howCards && Array.isArray(cfg.pricing)) {
-    howCards.innerHTML = cfg.pricing.map((p) => `
+  // How cards
+  const how = $("#howCards");
+  if (how && Array.isArray(cfg.pricing)) {
+    how.innerHTML = cfg.pricing.map(p => `
       <div class="card plan">
-        <div class="badge" style="display:inline-flex;margin:0 0 10px">${escapeHtml(p.tag || "")}</div>
-        <h4>${escapeHtml(p.title || "")}</h4>
-        <p class="p">${escapeHtml(p.text || "")}</p>
-        <ul>
-          ${(p.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}
-        </ul>
+        <span class="badge" style="display:inline-flex;margin:0 0 10px">${esc(p.tag || "")}</span>
+        <h4>${esc(p.title || "")}</h4>
+        <p class="p">${esc(p.text || "")}</p>
+        <ul>${(p.bullets || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
       </div>
     `).join("");
   }
 
-  // Big objects
-  const bigProcess = $("#bigProcess");
-  if (bigProcess && Array.isArray(cfg.bigProcess)) {
-    bigProcess.innerHTML = cfg.bigProcess.map((x) => `<li>${escapeHtml(x)}</li>`).join("");
-  }
-  const bigBenefits = $("#bigBenefits");
-  if (bigBenefits && Array.isArray(cfg.bigBenefits)) {
-    bigBenefits.innerHTML = cfg.bigBenefits.map((x) => `<li>${escapeHtml(x)}</li>`).join("");
-  }
+  // Big lists
+  renderList("#bigProcess", cfg.bigProcess);
+  renderList("#bigBenefits", cfg.bigBenefits);
 
   // FAQ
-  const faqList = $("#faqList");
-  if (faqList && Array.isArray(cfg.faq)) {
-    faqList.innerHTML = cfg.faq.map((f) => `
+  const faq = $("#faqList");
+  if (faq && Array.isArray(cfg.faq)) {
+    faq.innerHTML = cfg.faq.map(f => `
       <details>
-        <summary>${escapeHtml(f.q || "")}</summary>
-        <p>${escapeHtml(f.a || "")}</p>
+        <summary>${esc(f.q || "")}</summary>
+        <p>${esc(f.a || "")}</p>
       </details>
     `).join("");
   }
 
-  // Service select
-  const serviceSelect = $("#serviceSelect");
-  if (serviceSelect && Array.isArray(cfg.serviceOptions)) {
-    serviceSelect.innerHTML = cfg.serviceOptions.map((s) => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
+  // Select
+  const sel = $("#serviceSelect");
+  if (sel && Array.isArray(cfg.serviceOptions)) {
+    sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
   }
 
-  // Form submit -> Telegram / WhatsApp
+  // Form -> TG/WA
   const form = $("#leadForm");
   if (form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (!tg) return alert("Telegram не настроен. Проверь поле telegram в config.js");
-      const data = readForm(form);
-      const text = buildLeadText(cfg, data);
-      const url = `https://t.me/${tg}?text=${encodeURIComponent(text)}`;
-      window.open(url, "_blank");
+      if (!tg) return alert("Telegram не настроен в config.js");
+      const data = Object.fromEntries(new FormData(form).entries());
+      const text = buildText(data);
+      window.open(`https://t.me/${tg}?text=${encodeURIComponent(text)}`, "_blank");
     });
   }
 
   const sendWA = $("#sendWA");
   if (sendWA) {
     sendWA.addEventListener("click", () => {
-      if (!wa) return alert("WhatsApp не настроен. Проверь поле whatsapp в config.js");
-      const data = form ? readForm(form) : {};
-      const text = buildLeadText(cfg, data);
-      const url = `https://wa.me/${wa.replace(/[^\d]/g, "")}?text=${encodeURIComponent(text)}`;
-      window.open(url, "_blank");
+      if (!wa) return alert("WhatsApp не настроен в config.js");
+      const data = form ? Object.fromEntries(new FormData(form).entries()) : {};
+      const text = buildText(data);
+      window.open(`https://wa.me/${wa}?text=${encodeURIComponent(text)}`, "_blank");
     });
   }
 
-  function readForm(formEl) {
-    const fd = new FormData(formEl);
-    return Object.fromEntries(fd.entries());
+  function renderTags(sel, arr){
+    const el = $(sel);
+    if (!el || !Array.isArray(arr)) return;
+    el.innerHTML = arr.map(t => `<span class="badge">${esc(t)}</span>`).join("");
   }
 
-  function buildLeadText(cfg, data) {
-    const lines = [];
-    lines.push(`Заявка с сайта: ${cfg.brandName || "BreezeService"}`);
-    lines.push("");
-    if (data.name) lines.push(`Имя: ${data.name}`);
-    if (data.phone) lines.push(`Телефон: ${data.phone}`);
-    if (data.service) lines.push(`Услуга: ${data.service}`);
-    if (data.area) lines.push(`Район/адрес: ${data.area}`);
-    if (data.comment) lines.push(`Комментарий: ${data.comment}`);
-    lines.push("");
-    lines.push(`Время: ${new Date().toLocaleString("ru-RU")}`);
+  function renderList(sel, arr){
+    const el = $(sel);
+    if (!el || !Array.isArray(arr)) return;
+    el.innerHTML = arr.map(x => `<li>${esc(x)}</li>`).join("");
+  }
+
+  function buildText(d){
+    const lines = [
+      `Заявка с сайта: ${cfg.brandName || "BreezeService"}`,
+      "",
+      d.name ? `Имя: ${d.name}` : null,
+      d.phone ? `Телефон: ${d.phone}` : null,
+      d.service ? `Услуга: ${d.service}` : null,
+      d.area ? `Район/адрес: ${d.area}` : null,
+      d.comment ? `Комментарий: ${d.comment}` : null
+    ].filter(Boolean);
     return lines.join("\n");
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (m) => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      "\"":"&quot;",
-      "'":"&#39;"
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[m]));
-  }
-  function escapeAttr(s) {
-    return escapeHtml(s).replace(/"/g, "&quot;");
   }
 })();
