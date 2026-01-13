@@ -7,60 +7,64 @@
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
   <meta name="description" content="Установка, чистка, ремонт, диагностика и заправка фреоном кондиционеров в Ташкенте." />
 
-  <link rel="icon" href="./logo.png?v=7001" />
-  <link rel="stylesheet" href="./styles.css?v=7001" />
+  <link rel="icon" href="./logo.png?v=9001" />
+  <link rel="stylesheet" href="./styles.css?v=9001" />
 </head>
 
 <body id="top">
-  <!-- FIX for Instagram in-app browser: background layers as real elements (not pseudo) -->
+  <!-- Instagram-safe live background layers (real DOM elements, not pseudo) -->
   <div class="bg-wind" aria-hidden="true"></div>
   <div class="bg-hue" aria-hidden="true"></div>
+  <div class="bg-grain" aria-hidden="true"></div>
 
   <header class="nav" id="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="BreezeService">
         <span class="logo-shell">
-          <img class="logo" src="./logo.png?v=7001" alt="BreezeService">
+          <img class="logo" src="./logo.png?v=9001" alt="BreezeService logo">
         </span>
         <span class="brand-text">
           <span class="brand-name" data-bind="brandName">BreezeService</span>
-          <span class="brand-sub" data-bind="brandSub">Сервис кондиционеров • Ташкент</span>
+          <span class="brand-sub" data-bind="brandSub">Сервис кондиционеров в Ташкенте</span>
         </span>
       </a>
 
       <nav class="nav-links" aria-label="Навигация">
-        <a href="#services" class="nav-pill">Услуги</a>
-        <a href="#pricing" class="nav-pill">Цены</a>
-        <a href="#faq" class="nav-pill">FAQ</a>
-        <a href="#contact" class="nav-pill strong">Заявка</a>
+        <a class="nav-pill" href="#services">Услуги</a>
+        <a class="nav-pill" href="#pricing">Цены</a>
+        <a class="nav-pill" href="#faq">FAQ</a>
+        <a class="nav-pill strong" href="#contact">Заявка</a>
       </nav>
 
       <div class="nav-cta">
-        <a class="btn" id="callBtn" href="tel:+998910094469">Позвонить</a>
+        <a class="btn" id="callBtnTop" href="tel:+998910094469">Позвонить</a>
         <a class="btn primary" href="#contact">Заявка</a>
       </div>
     </div>
   </header>
 
   <main class="wrap">
+    <!-- HERO -->
     <section class="hero section" id="hero">
       <div class="card glass hero-main">
         <div class="kicker" data-bind="heroKicker">Ташкент • климат-сервис</div>
+
         <h1 data-bind="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
         <p class="lead" data-bind="heroLead"></p>
 
-        <div class="segmented" id="heroServiceChips" aria-label="Популярные услуги"></div>
+        <!-- service selector (looks like iOS segmented / chips) -->
+        <div class="segmented" id="heroServiceChips" aria-label="Выбор услуги"></div>
 
         <div class="hero-actions">
           <a class="btn primary" href="#contact">Оставить заявку</a>
-          <a class="btn" id="tgBtn" href="#">Telegram</a>
-          <a class="btn" id="waBtn" href="#">WhatsApp</a>
-          <a class="btn" id="igBtn" href="#">Instagram</a>
+          <a class="btn" id="tgBtn" href="#" target="_blank" rel="noopener">Telegram</a>
+          <a class="btn" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn" id="igBtn" href="#" target="_blank" rel="noopener">Instagram</a>
         </div>
 
         <div class="mini">
-          <span><span class="dot ok"></span><span data-bind="mini1"></span></span>
-          <span><span class="dot warn"></span><span data-bind="mini2"></span></span>
+          <span><span class="dot ok"></span><span data-bind="mini1">Гарантия на установку — 1 год</span></span>
+          <span><span class="dot warn"></span><span data-bind="mini2">Оплата по факту выполненной работы</span></span>
         </div>
       </div>
 
@@ -68,7 +72,7 @@
         <div class="card glass tile">
           <div class="tile-head">
             <h3>Популярное</h3>
-            <span class="chip" data-bind="tagPopular">быстро</span>
+            <span class="chip">быстро</span>
           </div>
           <div class="tile-grid" id="popularGrid"></div>
         </div>
@@ -76,48 +80,52 @@
         <div class="card glass tile">
           <div class="tile-head">
             <h3>Стоимость</h3>
-            <span class="chip" data-bind="tagPrice">прозрачно</span>
+            <span class="chip">прозрачно</span>
           </div>
           <div class="price" id="fromPrice">—</div>
           <div class="chips" id="badges"></div>
-          <div class="muted small" id="priceHint">—</div>
+          <div class="muted small" id="priceHint">Цена зависит от сложности и условий монтажа</div>
         </div>
       </aside>
     </section>
 
+    <!-- SERVICES -->
     <section id="services" class="section anchor">
       <div class="section-title">
-        <h2 data-bind="servicesTitle">Услуги</h2>
-        <p data-bind="servicesLead"></p>
+        <h2>Услуги</h2>
+        <p>Полный спектр работ по кондиционерам — бытовым и полупромышленным.</p>
       </div>
       <div class="grid-2" id="servicesBlocks"></div>
     </section>
 
+    <!-- PRICING -->
     <section id="pricing" class="section anchor">
       <div class="section-title">
-        <h2 data-bind="pricingTitle">Цены</h2>
-        <p data-bind="pricingLead"></p>
+        <h2>Цены</h2>
+        <p>Стоимость не фиксированная — зависит от объёма и условий. Перед выездом даём консультацию.</p>
       </div>
       <div class="grid-3" id="pricingCards"></div>
 
       <div class="card glass note">
         <span class="note-badge">Важно</span>
-        <div class="muted" data-bind="pricingNote"></div>
+        <div class="muted">Перед выездом вы всегда получаете предварительную консультацию по телефону.</div>
       </div>
     </section>
 
+    <!-- FAQ -->
     <section id="faq" class="section anchor">
       <div class="section-title">
-        <h2 data-bind="faqTitle">FAQ</h2>
-        <p data-bind="faqLead"></p>
+        <h2>FAQ</h2>
+        <p>Частые вопросы и условия гарантии.</p>
       </div>
       <div class="faq" id="faqList"></div>
     </section>
 
+    <!-- CONTACT -->
     <section id="contact" class="section anchor">
       <div class="section-title">
-        <h2 data-bind="contactTitle">Заявка</h2>
-        <p data-bind="contactLead"></p>
+        <h2>Заявка</h2>
+        <p>Заполни форму — откроем мессенджер с готовым текстом.</p>
       </div>
 
       <div class="contact">
@@ -148,17 +156,43 @@
             <button class="btn" type="button" id="sendWA">Отправить в WhatsApp</button>
           </div>
 
-          <p class="footnote">Нажимая кнопку, вы отправляете данные в мессенджер.</p>
+          <p class="footnote">Нажимая кнопку, вы отправляете данные в выбранный мессенджер.</p>
         </form>
 
         <div class="card glass side">
           <h3 class="side-title">Контакты</h3>
-          <div class="kv"><span class="muted">Телефон</span><span id="phoneText">—</span></div>
-          <div class="kv"><span class="muted">График</span><span data-bind="hours">—</span></div>
-          <div class="kv"><span class="muted">География</span><span data-bind="areas">—</span></div>
-          <div class="kv"><span class="muted">Telegram</span><span id="tgText">—</span></div>
-          <div class="kv"><span class="muted">WhatsApp</span><span id="waText">—</span></div>
-          <div class="kv"><span class="muted">Instagram</span><span id="igText">—</span></div>
+
+          <div class="kv"><span class="muted">Телефон</span><a id="phoneLink" href="tel:+998910094469">+998 91 009 44 69</a></div>
+          <div class="kv"><span class="muted">Звонки</span><span id="hoursText">10:00–18:00</span></div>
+          <div class="kv"><span class="muted">География</span><span id="areasText">Ташкент • выезд за город до 1–2 км</span></div>
+
+          <div class="kv"><span class="muted">Telegram</span><a id="tgText" href="#" target="_blank" rel="noopener">t.me/breezeserv1se</a></div>
+          <div class="kv"><span class="muted">WhatsApp</span><a id="waText" href="#" target="_blank" rel="noopener">написать</a></div>
+          <div class="kv"><span class="muted">Instagram</span><a id="igText" href="#" target="_blank" rel="noopener">@breezeservise.uz</a></div>
+
+          <div class="chips" id="sideBadges"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © <span id="year"></span> <span data-bind="brandName">BreezeService</span>
+    </footer>
+  </main>
+
+  <!-- Bottom bar for mobile (iOS-like) -->
+  <div class="bottom-bar" aria-label="Быстрые действия">
+    <a class="bb" id="bbCall" href="tel:+998910094469">Позвонить</a>
+    <a class="bb" id="bbTg" href="#" target="_blank" rel="noopener">Telegram</a>
+    <a class="bb primary" href="#contact">Заявка</a>
+  </div>
+
+  <!-- IMPORTANT: config first, then site -->
+  <script src="./config.js?v=9001"></script>
+  <script src="./site.js?v=9001"></script>
+</body>
+</html>
+ <div class="kv"><span class="muted">Instagram</span><span id="igText">—</span></div>
           <div class="chips" id="sideBadges"></div>
         </div>
       </div>
