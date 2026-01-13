@@ -6,170 +6,139 @@
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
   <meta name="description" content="Установка, чистка, ремонт, диагностика и заправка фреоном кондиционеров в Ташкенте." />
 
-  <!-- bump this if GitHub Pages caches -->
-  <link rel="icon" href="./logo.png?v=3000" />
-  <link rel="stylesheet" href="./styles.css?v=3000" />
+  <!-- bump version when updates don't show -->
+  <link rel="icon" href="./logo.png?v=5001" />
+  <link rel="stylesheet" href="./styles.css?v=5001" />
 </head>
 
 <body id="top">
-  <!-- RGB ambient -->
-  <div class="bg">
-    <div class="orb o1" aria-hidden="true"></div>
-    <div class="orb o2" aria-hidden="true"></div>
-    <div class="orb o3" aria-hidden="true"></div>
+  <div class="air-bg" aria-hidden="true">
+    <div class="air-orb a"></div>
+    <div class="air-orb b"></div>
+    <div class="air-orb c"></div>
   </div>
 
-  <header class="nav">
+  <header class="nav" id="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="BreezeService">
-        <span class="logoWrap">
-          <img class="logo" src="./logo.png?v=3000" alt="BreezeService" />
+        <span class="logo-shell">
+          <img class="logo" src="./logo.png?v=5001" alt="BreezeService">
         </span>
-        <span class="brandText">
-          <span class="brandName" data-bind="brandName">BreezeService</span>
-          <span class="brandSub" data-bind="brandSub">Сервис кондиционеров в Ташкенте</span>
+        <span class="brand-text">
+          <span class="brand-name" data-bind="brandName">BreezeService</span>
+          <span class="brand-sub" data-bind="brandSub">Сервис кондиционеров • Ташкент</span>
         </span>
       </a>
 
-      <nav class="navLinks" aria-label="Навигация">
-        <a href="#services">Услуги</a>
-        <a href="#pricing">Цены</a>
-        <a href="#faq">FAQ</a>
-        <a class="navPill" href="#contact">Заявка</a>
+      <nav class="nav-links" aria-label="Навигация">
+        <a href="#services" class="nav-pill">Услуги</a>
+        <a href="#pricing" class="nav-pill">Цены</a>
+        <a href="#faq" class="nav-pill">FAQ</a>
+        <a href="#contact" class="nav-pill strong">Заявка</a>
       </nav>
 
-      <div class="navCta">
-        <a class="btn btnGlass" id="callBtn" href="#" aria-label="Позвонить">
-          <span class="ico" aria-hidden="true">
-            <!-- phone -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M8.5 5.2c.3-1.1 1.3-1.9 2.5-1.9h2c1.2 0 2.2.8 2.5 1.9l.3 1.2c.2.8-.1 1.6-.8 2l-1 .6c-.3.2-.5.6-.4 1 1 2.7 3.1 4.8 5.8 5.8.4.1.8-.1 1-.4l.6-1c.4-.7 1.2-1 2-.8l1.2.3c1.1.3 1.9 1.3 1.9 2.5v2c0 1.4-1.2 2.6-2.6 2.5C9.6 21.4 2.6 14.4 2.1 6.6 2 5.2 3.2 4 4.6 4h2c1.2 0 2.2.8 2.5 1.9l.4 1.3Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span>Позвонить</span>
-          <i class="gloss" aria-hidden="true"></i>
-        </a>
-
-        <a class="btn btnPrimary" href="#contact">
-          <span class="ico" aria-hidden="true">
-            <!-- spark -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l1.3 5.1L18 8.4l-4.7 1.3L12 15l-1.3-5.3L6 8.4l4.7-1.3L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 14l.8 3 3 .8-3 .8-.8 3-.8-3-3-.8 3-.8.8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          </span>
-          <span>Заявка</span>
-          <i class="gloss" aria-hidden="true"></i>
-        </a>
+      <!-- Desktop only (mobile hides via CSS) -->
+      <div class="nav-cta">
+        <a class="btn glass" id="callBtn" href="tel:+998910094469">Позвонить</a>
+        <a class="btn primary" href="#contact">Заявка</a>
       </div>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="hero">
-      <div class="card heroLeft">
-        <div class="kicker" data-bind="heroKicker">Ташкент • Климат-сервис</div>
+    <!-- HERO -->
+    <section class="hero section" id="hero">
+      <div class="card glass hero-main">
+        <div class="kicker" data-bind="heroKicker">Ташкент • климат-сервис</div>
         <h1 data-bind="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
         <p class="lead" data-bind="heroLead">
-          Один звонок — консультация — выезд мастера без лишних сложностей.
+          Установка, чистка, ремонт, диагностика и заправка фреоном. Один звонок — консультация — выезд мастера без лишних сложностей.
         </p>
 
-        <div class="pillRow" id="heroPills"></div>
+        <div class="pill-row" id="heroPills"></div>
 
-        <div class="ctaRow">
-          <a class="btn btnPrimary" href="#contact">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <span data-bind="heroPrimaryCta">Оставить заявку</span>
-            <i class="gloss" aria-hidden="true"></i>
-          </a>
-
-          <a class="btn btnGlass" id="tgBtn" href="#" aria-label="Telegram">
-            <span class="ico" aria-hidden="true">
-              <!-- paper plane -->
-              <svg viewBox="0 0 24 24" fill="none"><path d="M21 3 3.8 10.1c-.8.3-.8 1.4 0 1.7l4.6 1.7 1.7 4.6c.3.8 1.4.8 1.7 0L21 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.4 13.5 21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <span>Telegram</span>
-            <i class="gloss" aria-hidden="true"></i>
-          </a>
-
-          <a class="btn btnGlass" id="waBtn" href="#" aria-label="WhatsApp">
-            <span class="ico" aria-hidden="true">
-              <!-- chat bubble -->
-              <svg viewBox="0 0 24 24" fill="none"><path d="M20 12a7.6 7.6 0 0 1-7.7 7.6c-1.2 0-2.3-.3-3.3-.7L4 20l1.2-4.6c-.6-1-.9-2.2-.9-3.4A7.6 7.6 0 0 1 12 4.4 7.6 7.6 0 0 1 20 12Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <span>WhatsApp</span>
-            <i class="gloss" aria-hidden="true"></i>
-          </a>
+        <div class="hero-actions">
+          <a class="btn primary" href="#contact">Оставить заявку</a>
+          <a class="btn glass" id="tgBtn" href="#">Telegram</a>
+          <a class="btn glass" id="waBtn" href="#">WhatsApp</a>
         </div>
 
-        <div class="miniRow">
-          <span class="mini"><i class="dot ok"></i><span data-bind="mini1">Гарантия на установку — 1 год</span></span>
-          <span class="mini"><i class="dot warn"></i><span data-bind="mini2">Оплата по факту выполненной работы</span></span>
+        <div class="mini">
+          <span><span class="dot ok"></span><span data-bind="mini1">Гарантия на установку — 1 год</span></span>
+          <span><span class="dot warn"></span><span data-bind="mini2">Оплата по факту выполненной работы</span></span>
         </div>
       </div>
 
-      <aside class="heroRight">
-        <div class="card inset">
-          <div class="insetHead">
+      <aside class="hero-side">
+        <div class="card glass tile">
+          <div class="tile-head">
             <h3>Популярное</h3>
-            <span class="tag" data-bind="tagPopular">быстро</span>
+            <span class="chip" data-bind="tagPopular">быстро</span>
           </div>
-          <div class="grid3" id="popularGrid"></div>
+          <div class="tile-grid" id="popularGrid"></div>
         </div>
 
-        <div class="card inset">
-          <div class="insetHead">
+        <div class="card glass tile">
+          <div class="tile-head">
             <h3>Стоимость</h3>
-            <span class="tag" data-bind="tagPrice">честно</span>
+            <span class="chip" data-bind="tagPrice">честно</span>
           </div>
           <div class="price" id="fromPrice">—</div>
-          <div class="badges" id="badges"></div>
+          <div class="chips" id="badges"></div>
           <div class="muted small" id="priceHint">—</div>
         </div>
       </aside>
     </section>
 
-    <section id="services">
-      <div class="sectionTitle">
+    <!-- SERVICES -->
+    <section id="services" class="section anchor">
+      <div class="section-title">
         <h2 data-bind="servicesTitle">Услуги</h2>
-        <p data-bind="servicesLead">Полный спектр работ по кондиционерам.</p>
+        <p data-bind="servicesLead">Работаем со всеми марками и моделями — бытовыми и полупромышленными.</p>
       </div>
-      <div class="two" id="servicesBlocks"></div>
+      <div class="grid-2" id="servicesBlocks"></div>
     </section>
 
-    <section id="pricing">
-      <div class="sectionTitle">
+    <!-- PRICING -->
+    <section id="pricing" class="section anchor">
+      <div class="section-title">
         <h2 data-bind="pricingTitle">Цены</h2>
-        <p data-bind="pricingLead">Стоимость зависит от объёма и условий.</p>
+        <p data-bind="pricingLead">Стоимость не фиксирована — зависит от условий и объёма.</p>
       </div>
-      <div class="pricingGrid" id="pricingCards"></div>
-      <div class="card noteCard">
-        <div class="noteTitle">Важно</div>
-        <div class="muted" data-bind="pricingNote">Перед выездом — консультация по телефону.</div>
+      <div class="grid-3" id="pricingCards"></div>
+
+      <div class="card glass note">
+        <span class="note-badge">Важно</span>
+        <div class="muted" data-bind="pricingNote">Перед выездом вы всегда получаете предварительную консультацию по телефону.</div>
       </div>
     </section>
 
-    <section id="faq">
-      <div class="sectionTitle">
+    <!-- FAQ -->
+    <section id="faq" class="section anchor">
+      <div class="section-title">
         <h2 data-bind="faqTitle">FAQ</h2>
         <p data-bind="faqLead">Гарантии и частые вопросы.</p>
       </div>
       <div class="faq" id="faqList"></div>
     </section>
 
-    <section id="contact">
-      <div class="sectionTitle">
+    <!-- CONTACT -->
+    <section id="contact" class="section anchor">
+      <div class="section-title">
         <h2 data-bind="contactTitle">Заявка</h2>
         <p data-bind="contactLead">Заполни форму — откроем мессенджер с готовым текстом.</p>
       </div>
 
       <div class="contact">
-        <form class="card form" id="leadForm">
-          <div class="formRow">
+        <form class="card glass form" id="leadForm">
+          <div class="form-row">
             <div>
               <label>Имя</label>
-              <input name="name" placeholder="Например, Шиори" required />
+              <input name="name" placeholder="Ваше имя" required>
             </div>
             <div>
               <label>Телефон</label>
-              <input name="phone" placeholder="+998..." required />
+              <input name="phone" placeholder="+998..." required>
             </div>
           </div>
 
@@ -177,41 +146,27 @@
           <select name="service" id="serviceSelect"></select>
 
           <label>Район / адрес</label>
-          <input name="area" placeholder="Ташкент, район (можно примерно)" />
+          <input name="area" placeholder="Ташкент, район (примерно)">
 
           <label>Комментарий</label>
-          <textarea name="comment" placeholder="Например: не холодит, капает, запах, нужна установка 12-ки..."></textarea>
+          <textarea name="comment" placeholder="Не холодит / капает / запах / нужна установка..."></textarea>
 
-          <div class="ctaRow" style="margin-top:14px">
-            <button class="btn btnPrimary" type="submit">
-              <span class="ico" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M21 5 10 12l11 7V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 5h7l-7 7V5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              </span>
-              <span>Отправить в Telegram</span>
-              <i class="gloss" aria-hidden="true"></i>
-            </button>
-
-            <button class="btn btnGlass" type="button" id="sendWA">
-              <span class="ico" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M20 12a7.6 7.6 0 0 1-7.7 7.6c-1.2 0-2.3-.3-3.3-.7L4 20l1.2-4.6c-.6-1-.9-2.2-.9-3.4A7.6 7.6 0 0 1 12 4.4 7.6 7.6 0 0 1 20 12Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              </span>
-              <span>Отправить в WhatsApp</span>
-              <i class="gloss" aria-hidden="true"></i>
-            </button>
+          <div class="actions">
+            <button class="btn primary" type="submit">Отправить в Telegram</button>
+            <button class="btn glass" type="button" id="sendWA">Отправить в WhatsApp</button>
           </div>
 
-          <p class="note">Нажимая “Отправить”, вы отправляете данные в мессенджер.</p>
+          <p class="footnote">Нажимая кнопку, вы отправляете данные в мессенджер.</p>
         </form>
 
-        <div class="card side">
-          <h3 class="sideTitle">Контакты</h3>
-          <div class="row"><span class="muted">Телефон</span><span id="phoneText">—</span></div>
-          <div class="row"><span class="muted">График</span><span data-bind="hours">—</span></div>
-          <div class="row"><span class="muted">География</span><span data-bind="areas">—</span></div>
-          <div class="row"><span class="muted">Telegram</span><span id="tgText">—</span></div>
-          <div class="row"><span class="muted">WhatsApp</span><span id="waText">—</span></div>
-          <div class="badges" id="sideBadges"></div>
-          <div class="muted small" style="margin-top:14px" data-bind="contactNote">Мы всегда на связи.</div>
+        <div class="card glass side">
+          <h3 class="side-title">Контакты</h3>
+          <div class="kv"><span class="muted">Телефон</span><span id="phoneText">—</span></div>
+          <div class="kv"><span class="muted">График</span><span data-bind="hours">—</span></div>
+          <div class="kv"><span class="muted">География</span><span data-bind="areas">—</span></div>
+          <div class="kv"><span class="muted">Telegram</span><span id="tgText">—</span></div>
+          <div class="kv"><span class="muted">WhatsApp</span><span id="waText">—</span></div>
+          <div class="chips" id="sideBadges"></div>
         </div>
       </div>
     </section>
@@ -221,14 +176,15 @@
     </footer>
   </main>
 
-  <!-- Mobile bottom glass bar -->
-  <div class="bottomBar" aria-label="Быстрые действия">
-    <a class="bb bbGlass" id="bbCall" href="#">Позвонить</a>
-    <a class="bb bbGlass" id="bbTg" href="#">Telegram</a>
-    <a class="bb bbPrimary" href="#contact">Заявка</a>
+  <!-- Mobile bottom actions (iOS-like) -->
+  <div class="bottom-bar" aria-label="Быстрые действия">
+    <a class="bb glass" id="bbCall" href="tel:+998910094469">Позвонить</a>
+    <a class="bb glass" id="bbTg" href="#">Telegram</a>
+    <a class="bb primary" href="#contact">Заявка</a>
   </div>
 
-  <script src="./config.js?v=3000"></script>
-  <script src="./site.js?v=3000"></script>
+  <!-- IMPORTANT: config first -->
+  <script src="./config.js?v=5001"></script>
+  <script src="./site.js?v=5001"></script>
 </body>
 </html>
