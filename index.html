@@ -6,23 +6,17 @@
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
   <meta name="description" content="Установка, чистка, ремонт, диагностика и заправка фреоном кондиционеров в Ташкенте." />
 
-  <!-- bump version when updates don't show -->
-  <link rel="icon" href="./logo.png?v=5001" />
-  <link rel="stylesheet" href="./styles.css?v=5001" />
+  <!-- cache-buster: increase number when updates don't show -->
+  <link rel="icon" href="./logo.png?v=6001" />
+  <link rel="stylesheet" href="./styles.css?v=6001" />
 </head>
 
 <body id="top">
-  <div class="air-bg" aria-hidden="true">
-    <div class="air-orb a"></div>
-    <div class="air-orb b"></div>
-    <div class="air-orb c"></div>
-  </div>
-
   <header class="nav" id="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="BreezeService">
         <span class="logo-shell">
-          <img class="logo" src="./logo.png?v=5001" alt="BreezeService">
+          <img class="logo" src="./logo.png?v=6001" alt="BreezeService">
         </span>
         <span class="brand-text">
           <span class="brand-name" data-bind="brandName">BreezeService</span>
@@ -37,7 +31,7 @@
         <a href="#contact" class="nav-pill strong">Заявка</a>
       </nav>
 
-      <!-- Desktop only (mobile hides via CSS) -->
+      <!-- desktop only (hidden on mobile via CSS) -->
       <div class="nav-cta">
         <a class="btn glass" id="callBtn" href="tel:+998910094469">Позвонить</a>
         <a class="btn primary" href="#contact">Заявка</a>
@@ -52,15 +46,17 @@
         <div class="kicker" data-bind="heroKicker">Ташкент • климат-сервис</div>
         <h1 data-bind="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
         <p class="lead" data-bind="heroLead">
-          Установка, чистка, ремонт, диагностика и заправка фреоном. Один звонок — консультация — выезд мастера без лишних сложностей.
+          Помогаем частным клиентам и объектам любого масштаба: от чистки до установки и ремонта. Один звонок — консультация — выезд мастера без лишних сложностей.
         </p>
 
-        <div class="pill-row" id="heroPills"></div>
+        <!-- iOS-like quick service chips -->
+        <div class="segmented glass" id="heroServiceChips" aria-label="Популярные услуги"></div>
 
         <div class="hero-actions">
           <a class="btn primary" href="#contact">Оставить заявку</a>
           <a class="btn glass" id="tgBtn" href="#">Telegram</a>
           <a class="btn glass" id="waBtn" href="#">WhatsApp</a>
+          <a class="btn glass" id="igBtn" href="#">Instagram</a>
         </div>
 
         <div class="mini">
@@ -81,7 +77,7 @@
         <div class="card glass tile">
           <div class="tile-head">
             <h3>Стоимость</h3>
-            <span class="chip" data-bind="tagPrice">честно</span>
+            <span class="chip" data-bind="tagPrice">прозрачно</span>
           </div>
           <div class="price" id="fromPrice">—</div>
           <div class="chips" id="badges"></div>
@@ -94,7 +90,7 @@
     <section id="services" class="section anchor">
       <div class="section-title">
         <h2 data-bind="servicesTitle">Услуги</h2>
-        <p data-bind="servicesLead">Работаем со всеми марками и моделями — бытовыми и полупромышленными.</p>
+        <p data-bind="servicesLead">Полный спектр работ по кондиционерам.</p>
       </div>
       <div class="grid-2" id="servicesBlocks"></div>
     </section>
@@ -117,7 +113,7 @@
     <section id="faq" class="section anchor">
       <div class="section-title">
         <h2 data-bind="faqTitle">FAQ</h2>
-        <p data-bind="faqLead">Гарантии и частые вопросы.</p>
+        <p data-bind="faqLead">Ответы на частые вопросы.</p>
       </div>
       <div class="faq" id="faqList"></div>
     </section>
@@ -143,7 +139,8 @@
           </div>
 
           <label>Услуга</label>
-          <select name="service" id="serviceSelect"></select>
+          <input type="hidden" name="service" id="serviceHidden" value="">
+          <div class="segmented glass" id="serviceChips"></div>
 
           <label>Район / адрес</label>
           <input name="area" placeholder="Ташкент, район (примерно)">
@@ -166,6 +163,7 @@
           <div class="kv"><span class="muted">География</span><span data-bind="areas">—</span></div>
           <div class="kv"><span class="muted">Telegram</span><span id="tgText">—</span></div>
           <div class="kv"><span class="muted">WhatsApp</span><span id="waText">—</span></div>
+          <div class="kv"><span class="muted">Instagram</span><span id="igText">—</span></div>
           <div class="chips" id="sideBadges"></div>
         </div>
       </div>
@@ -176,7 +174,7 @@
     </footer>
   </main>
 
-  <!-- Mobile bottom actions (iOS-like) -->
+  <!-- mobile bottom actions -->
   <div class="bottom-bar" aria-label="Быстрые действия">
     <a class="bb glass" id="bbCall" href="tel:+998910094469">Позвонить</a>
     <a class="bb glass" id="bbTg" href="#">Telegram</a>
@@ -184,7 +182,7 @@
   </div>
 
   <!-- IMPORTANT: config first -->
-  <script src="./config.js?v=5001"></script>
-  <script src="./site.js?v=5001"></script>
+  <script src="./config.js?v=6001"></script>
+  <script src="./site.js?v=6001"></script>
 </body>
-</html>
+</html></html>
