@@ -1,207 +1,390 @@
 (() => {
-  const cfg = window.SITE_CONFIG;
-  if (!cfg) return;
+  const cfg = window.SITE_CONFIG || {};
 
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // bind text nodes
-  $$("[data-bind]").forEach((el) => {
-    const key = el.getAttribute("data-bind");
-    if (cfg[key] != null) el.textContent = cfg[key];
-  });
+  function safeText(v) { return (v ?? "").toString(); }
 
-  // year
-  const y = $("#year");
-  if (y) y.textContent = new Date().getFullYear();
-
-  // contacts
-  const phoneRaw = String(cfg.phone || "").replace(/\s+/g, "");
-  const phonePretty = cfg.phonePretty || cfg.phone || "";
-  const tg = String(cfg.telegram || "").trim();
-  const ig = String(cfg.instagram || "").trim();
-  const waDigits = String(cfg.whatsapp || "").replace(/[^\d]/g, "");
-
-  const setHref = (sel, href) => { const el = $(sel); if (el) el.href = href; };
-
-  // call => phone app
-  if (phoneRaw) {
-    setHref("#callBtn", `tel:${phoneRaw}`);
-    setHref("#bbCall", `tel:${phoneRaw}`);
+  function setBindTexts() {
+    $$("[data-bind]").forEach(el => {
+      const key = el.getAttribute("data-bind");
+      if (!key) return;
+      if (cfg[key] == null) return;
+      el.textContent = safeText(cfg[key]);
+    });
   }
 
-  // telegram
-  if (tg) {
-    setHref("#tgBtn", `https://t.me/${tg}`);
-    setHref("#bbTg", `https://t.me/${tg}`);
-    const t = $("#tgText"); if (t) t.textContent = `@${tg}`;
+  function addGlassLayers() {
+    // Add inner wind + highlight to every .glass (one-time)
+    $$(".glass").forEach(card => {
+      // avoid duplicates
+      if (card.querySelector(".inner-wind")) return;
+
+      const inner = document.createElement("div");
+      inner.className = "inner-wind";
+
+      const hi = document.createElement("div");
+      hi.className = "glass-highlight";
+
+      card.prepend(inner);
+      card.prepend(hi);
+    });
   }
 
-  // whatsapp
-  if (waDigits) {
-    setHref("#waBtn", `https://wa.me/${waDigits}`);
-    const w = $("#waText"); if (w) w.textContent = `+${waDigits}`;
+  function renderChips(container, options, onPick, defaultValue) {
+    container.innerHTML = "";
+    options.forEach((name, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "seg-chip";
+      b.textContent = name;
+
+      if ((defaultValue && name === defaultValue) || (!defaultValue && idx === 0)) {
+        b.classList.add("active");
+      }
+
+      b.addEventListener("click", () => {
+        container.querySelectorAll(".seg-chip").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        onPick(name);
+      });
+
+      container.appendChild(b);
+    });
+
+    // init selected
+    const active = container.querySelector(".seg-chip.active");
+    if (active) onPick(active.textContent);
   }
 
-  // instagram
-  if (ig) {
-    setHref("#igBtn", `https://instagram.com/${ig}`);
-    const i = $("#igText"); if (i) i.textContent = `@${ig}`;
+  function renderPopular() {
+    const grid = $("#popularGrid");
+    if (!grid) return;
+
+    const items = Array.isArray(cfg.popular) ? cfg.popular : [];
+    grid.innerHTML = "";
+
+    items.forEach(it => {
+      const d = document.createElement("div");
+      d.className = "tile-item";
+      d.innerHTML = `
+        <h4>${safeText(it.title)}</h4>
+        <p>${safeText(it.text)}</p>
+      `;
+      grid.appendChild(d);
+    });
   }
 
-  const p = $("#phoneText"); if (p) p.textContent = phonePretty || "—";
+  function renderServices() {
+    const host = $("#servicesBlocks");
+    if (!host) return;
 
-  // HERO service chips
-  renderChipsRow("#heroServiceChips", cfg.heroServices);
+    const blocks = Array.isArray(cfg.services) ? cfg.services : [];
+    host.innerHTML = "";
 
-  // popular tiles
-  const pop = $("#popularGrid");
-  if (pop && Array.isArray(cfg.popular)) {
-    pop.innerHTML = cfg.popular.map(p => `
-      <div class="tile-item">
-        <h4>${esc(p.title || "")}</h4>
-        <p>${esc(p.text || "")}</p>
-      </div>
-    `).join("");
-  }
-
-  // price + badges
-  const from = $("#fromPrice"); if (from) from.textContent = cfg.fromPrice || "—";
-  const hint = $("#priceHint"); if (hint) hint.textContent = cfg.priceHint || "";
-
-  renderTagChips("#badges", cfg.badges);
-  renderTagChips("#sideBadges", cfg.sideBadges);
-
-  // services blocks
-  const services = $("#servicesBlocks");
-  if (services && Array.isArray(cfg.services)) {
-    services.innerHTML = cfg.services.map(block => `
-      <div class="card glass block">
-        <h3>${esc(block.title || "")}</h3>
+    blocks.forEach(block => {
+      const card = document.createElement("div");
+      card.className = "card glass block";
+      card.innerHTML = `
+        <h3>${safeText(block.title)}</h3>
         <ul>
-          ${(block.items || []).map(it => `
+          ${(block.items || []).map(x => `
             <li class="li">
               <span class="check"></span>
               <div>
-                <b>${esc(it.b || "")}</b>
-                <span>${esc(it.s || "")}</span>
+                <b>${safeText(x.b)}</b>
+                <span>${safeText(x.s)}</span>
               </div>
             </li>
           `).join("")}
         </ul>
-      </div>
-    `).join("");
-  }
-
-  // pricing
-  const pricing = $("#pricingCards");
-  if (pricing && Array.isArray(cfg.pricing)) {
-    pricing.innerHTML = cfg.pricing.map(p => `
-      <div class="card glass priceCard">
-        <h4>${esc(p.title || "")}</h4>
-        <p class="p">${esc(p.text || "")}</p>
-        <ul>${(p.bullets || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-      </div>
-    `).join("");
-  }
-
-  // faq (animated container)
-  const faq = $("#faqList");
-  if (faq && Array.isArray(cfg.faq)) {
-    faq.innerHTML = cfg.faq.map(f => `
-      <details>
-        <summary>${esc(f.q || "")}</summary>
-        <div class="faq-a"><p>${esc(f.a || "")}</p></div>
-      </details>
-    `).join("");
-  }
-
-  // service chips in form
-  const chipsWrap = $("#serviceChips");
-  const serviceHidden = $("#serviceHidden");
-  if (chipsWrap && serviceHidden && Array.isArray(cfg.serviceOptions)) {
-    chipsWrap.innerHTML = cfg.serviceOptions.map((s, idx) =>
-      `<button type="button" class="seg-chip${idx===0 ? " active" : ""}" data-val="${esc(s)}">${esc(s)}</button>`
-    ).join("");
-
-    serviceHidden.value = cfg.serviceOptions[0] || "";
-
-    chipsWrap.addEventListener("click", (e) => {
-      const btn = e.target.closest(".seg-chip");
-      if (!btn) return;
-      chipsWrap.querySelectorAll(".seg-chip").forEach(x => x.classList.remove("active"));
-      btn.classList.add("active");
-      serviceHidden.value = btn.getAttribute("data-val") || "";
+      `;
+      host.appendChild(card);
     });
   }
 
-  // form -> TG/WA
-  const form = $("#leadForm");
-  if (form) {
+  function renderPricing() {
+    const host = $("#pricingCards");
+    if (!host) return;
+
+    const cards = Array.isArray(cfg.pricing) ? cfg.pricing : [];
+    host.innerHTML = "";
+
+    cards.forEach(p => {
+      const el = document.createElement("div");
+      el.className = "card glass priceCard";
+      el.innerHTML = `
+        <div class="tile-head">
+          <h4>${safeText(p.title)}</h4>
+          <span class="chip">${safeText(p.tag)}</span>
+        </div>
+        <p class="p">${safeText(p.text)}</p>
+        <div class="price">${safeText(p.cost)}</div>
+        <ul>
+          ${(p.bullets || []).map(b => `<li>${safeText(b)}</li>`).join("")}
+        </ul>
+      `;
+      host.appendChild(el);
+    });
+  }
+
+  // Smooth FAQ animation: height transitions to scrollHeight
+  function renderFAQ() {
+    const host = $("#faqList");
+    if (!host) return;
+
+    const list = Array.isArray(cfg.faq) ? cfg.faq : [];
+    host.innerHTML = "";
+
+    list.forEach((f, i) => {
+      const item = document.createElement("div");
+      item.className = "card glass faq-item";
+
+      item.innerHTML = `
+        <div class="faq-q" role="button" aria-expanded="false" tabindex="0">
+          <span>${safeText(f.q)}</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a" aria-hidden="true">
+          <div class="faq-a-inner">${safeText(f.a)}</div>
+        </div>
+      `;
+
+      const q = $(".faq-q", item);
+      const a = $(".faq-a", item);
+
+      const toggle = () => {
+        const isOpen = item.classList.contains("open");
+        // close all others (nice UX)
+        $$(".faq-item.open").forEach(x => {
+          if (x === item) return;
+          x.classList.remove("open");
+          const ax = $(".faq-a", x);
+          const qx = $(".faq-q", x);
+          if (ax) ax.style.height = "0px";
+          if (qx) {
+            qx.setAttribute("aria-expanded", "false");
+            const icon = $(".faq-icon", x);
+            if (icon) icon.textContent = "+";
+          }
+        });
+
+        if (!isOpen) {
+          item.classList.add("open");
+          q.setAttribute("aria-expanded", "true");
+          const inner = $(".faq-a-inner", item);
+          const h = inner ? inner.scrollHeight : 0;
+          a.style.height = h + "px";
+          const icon = $(".faq-icon", item);
+          if (icon) icon.textContent = "×";
+        } else {
+          item.classList.remove("open");
+          q.setAttribute("aria-expanded", "false");
+          a.style.height = "0px";
+          const icon = $(".faq-icon", item);
+          if (icon) icon.textContent = "+";
+        }
+      };
+
+      q.addEventListener("click", toggle);
+      q.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggle();
+        }
+      });
+
+      host.appendChild(item);
+    });
+  }
+
+  function setContacts() {
+    const phone = safeText(cfg.phone || "");
+    const phonePretty = safeText(cfg.phonePretty || phone);
+
+    // phone
+    const phoneLink = $("#phoneLink");
+    if (phoneLink) {
+      phoneLink.href = `tel:${phone}`;
+      phoneLink.textContent = phonePretty || phone;
+    }
+
+    // hours/areas
+    const hoursText = $("#hoursText");
+    if (hoursText) hoursText.textContent = safeText(cfg.hours || "");
+    const areasText = $("#areasText");
+    if (areasText) areasText.textContent = safeText(cfg.areas || "");
+
+    // telegram / whatsapp / instagram
+    const tgUrl = safeText(cfg.telegramUrl || "");
+    const waMe = safeText(cfg.whatsappWaMe || "");
+    const igUrl = safeText(cfg.instagramUrl || "");
+    const igHandle = safeText(cfg.instagramHandle || "");
+
+    const tgBtns = [$("#tgBtn"), $("#bbTg"), $("#tgText")].filter(Boolean);
+    tgBtns.forEach(el => {
+      el.href = tgUrl || "#";
+      // tgText content already in HTML, keep it
+    });
+
+    const waUrl = waMe ? `https://wa.me/${waMe}` : "#";
+    const waBtns = [$("#waBtn"), $("#waText")].filter(Boolean);
+    waBtns.forEach(el => el.href = waUrl);
+
+    const igBtns = [$("#igBtn"), $("#igText")].filter(Boolean);
+    igBtns.forEach(el => el.href = igUrl || "#");
+    if ($("#igText")) $("#igText").textContent = igHandle ? `@${igHandle}` : "@instagram";
+
+    // call buttons
+    const callTop = $("#callBtnTop");
+    const bbCall = $("#bbCall");
+    if (callTop) callTop.href = `tel:${phone}`;
+    if (bbCall) bbCall.href = `tel:${phone}`;
+
+    // top pricing hints
+    const fromPrice = $("#fromPrice");
+    if (fromPrice) fromPrice.textContent = safeText(cfg.fromPrice || "—");
+    const priceHint = $("#priceHint");
+    if (priceHint) priceHint.textContent = safeText(cfg.priceHint || "");
+  }
+
+  function setBadges() {
+    const badges = $("#badges");
+    if (badges) {
+      badges.innerHTML = "";
+      (cfg.badges || []).forEach(t => {
+        const s = document.createElement("span");
+        s.className = "chip2";
+        s.textContent = safeText(t);
+        badges.appendChild(s);
+      });
+    }
+    const side = $("#sideBadges");
+    if (side) {
+      side.innerHTML = "";
+      (cfg.sideBadges || []).forEach(t => {
+        const s = document.createElement("span");
+        s.className = "chip2";
+        s.textContent = safeText(t);
+        side.appendChild(s);
+      });
+    }
+  }
+
+  function initServiceSelectors() {
+    const options = Array.isArray(cfg.serviceOptions) ? cfg.serviceOptions : [];
+    if (!options.length) return;
+
+    const serviceHidden = $("#serviceHidden");
+
+    // hero chips
+    const heroChips = $("#heroServiceChips");
+    if (heroChips) {
+      renderChips(heroChips, options.slice(0, 6), (val) => {
+        if (serviceHidden && !serviceHidden.value) serviceHidden.value = val;
+      }, options[0]);
+    }
+
+    // form chips
+    const formChips = $("#serviceChips");
+    if (formChips && serviceHidden) {
+      renderChips(formChips, options, (val) => {
+        serviceHidden.value = val;
+      }, options[0]);
+      serviceHidden.value = options[0];
+    }
+  }
+
+  function buildMessage(formData) {
+    const name = safeText(formData.get("name"));
+    const phone = safeText(formData.get("phone"));
+    const service = safeText(formData.get("service"));
+    const area = safeText(formData.get("area"));
+    const comment = safeText(formData.get("comment"));
+
+    const lines = [
+      "Заявка BreezeService",
+      "",
+      `Имя: ${name}`,
+      `Телефон: ${phone}`,
+      `Услуга: ${service}`,
+      area ? `Адрес/район: ${area}` : null,
+      comment ? `Комментарий: ${comment}` : null
+    ].filter(Boolean);
+
+    return lines.join("\n");
+  }
+
+  function initForm() {
+    const form = $("#leadForm");
+    if (!form) return;
+
+    const tgUrl = safeText(cfg.telegramUrl || "");
+    const waMe = safeText(cfg.whatsappWaMe || "");
+    const waUrl = waMe ? `https://wa.me/${waMe}` : "";
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (!tg) return alert("Telegram не настроен в config.js");
-      const data = Object.fromEntries(new FormData(form).entries());
-      const text = buildText(cfg, data);
-      window.open(`https://t.me/${tg}?text=${encodeURIComponent(text)}`, "_blank");
+      const fd = new FormData(form);
+      const msg = buildMessage(fd);
+
+      // Telegram: open chat link + prefill text via ?text=... is not standard for channels,
+      // so we open tgUrl and also copy text to clipboard best-effort.
+      // (Works reliably across browsers.)
+      try {
+        navigator.clipboard?.writeText(msg);
+      } catch {}
+      if (tgUrl) window.open(tgUrl, "_blank");
+      else alert(msg);
+    });
+
+    const sendWA = $("#sendWA");
+    if (sendWA) {
+      sendWA.addEventListener("click", () => {
+        const fd = new FormData(form);
+        const msg = encodeURIComponent(buildMessage(fd));
+        if (waUrl) window.open(`${waUrl}?text=${msg}`, "_blank");
+      });
+    }
+  }
+
+  function setYear() {
+    const y = $("#year");
+    if (y) y.textContent = new Date().getFullYear();
+  }
+
+  // Fix: after FAQ opens, keep height correct on resize
+  function resizeFAQHeights() {
+    $$(".faq-item.open").forEach(item => {
+      const a = $(".faq-a", item);
+      const inner = $(".faq-a-inner", item);
+      if (!a || !inner) return;
+      a.style.height = inner.scrollHeight + "px";
     });
   }
 
-  const sendWA = $("#sendWA");
-  if (sendWA) {
-    sendWA.addEventListener("click", () => {
-      if (!waDigits) return alert("WhatsApp не настроен в config.js");
-      const data = form ? Object.fromEntries(new FormData(form).entries()) : {};
-      const text = buildText(cfg, data);
-      window.open(`https://wa.me/${waDigits}?text=${encodeURIComponent(text)}`, "_blank");
-    });
+  function boot() {
+    setBindTexts();
+    setContacts();
+    renderPopular();
+    renderServices();
+    renderPricing();
+    renderFAQ();
+    setBadges();
+    initServiceSelectors();
+    initForm();
+    setYear();
+
+    // add glass layers after DOM built
+    addGlassLayers();
+
+    window.addEventListener("resize", () => resizeFAQHeights());
   }
 
-  // Smooth scroll with offset (prevents "cut text" under sticky nav)
-  const NAV_OFFSET = 104;
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener("click", (e) => {
-      const id = a.getAttribute("href");
-      if (!id || id === "#" || id === "#top") return;
-
-      const target = document.querySelector(id);
-      if (!target) return;
-
-      e.preventDefault();
-      const y = target.getBoundingClientRect().top + window.pageYOffset - NAV_OFFSET;
-      window.scrollTo({ top: y, behavior: "smooth" });
-      history.pushState(null, "", id);
-    });
-  });
-
-  function renderTagChips(sel, arr){
-    const el = $(sel);
-    if (!el || !Array.isArray(arr)) return;
-    el.innerHTML = arr.map(t => `<span class="chip2">${esc(t)}</span>`).join("");
-  }
-
-  function renderChipsRow(sel, arr){
-    const el = $(sel);
-    if (!el || !Array.isArray(arr)) return;
-    el.innerHTML = arr.map(t => `<span class="seg-chip" style="pointer-events:none">${esc(t)}</span>`).join("");
-  }
-
-  function buildText(cfg, d){
-    return [
-      `Заявка с сайта: ${cfg.brandName || "BreezeService"}`,
-      "",
-      d.name ? `Имя: ${d.name}` : null,
-      d.phone ? `Телефон: ${d.phone}` : null,
-      d.service ? `Услуга: ${d.service}` : null,
-      d.area ? `Район/адрес: ${d.area}` : null,
-      d.comment ? `Комментарий: ${d.comment}` : null
-    ].filter(Boolean).join("\n");
-  }
-
-  function esc(s){
-    return String(s).replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
 })();
-;
