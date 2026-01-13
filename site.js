@@ -5,17 +5,17 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // Bind text
-  $$("[data-bind]").forEach((el) => {
+  // bind simple text
+  $$("[data-bind]").forEach(el => {
     const key = el.getAttribute("data-bind");
     if (cfg[key] != null) el.textContent = cfg[key];
   });
 
-  // Year
+  // year
   const y = $("#year");
   if (y) y.textContent = new Date().getFullYear();
 
-  // Phone/messengers
+  // helpers
   const phone = (cfg.phone || "").replace(/\s+/g, "");
   const phonePretty = cfg.phonePretty || cfg.phone || "";
   const tg = cfg.telegram || "";
@@ -38,40 +38,41 @@
 
   const bbCall = $("#bbCall");
   if (bbCall && phone) bbCall.href = `tel:${phone}`;
+
   const bbTg = $("#bbTg");
   if (bbTg && tg) bbTg.href = `https://t.me/${tg}`;
 
-  // Pills
-  const heroPills = $("#heroPills");
-  if (heroPills && Array.isArray(cfg.heroPills)) {
-    heroPills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
+  // pills
+  const pills = $("#heroPills");
+  if (pills && Array.isArray(cfg.heroPills)) {
+    pills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
   }
 
-  // Popular
-  const popularGrid = $("#popularGrid");
-  if (popularGrid && Array.isArray(cfg.popular)) {
-    popularGrid.innerHTML = cfg.popular.map(p => `
-      <div class="s-card">
+  // popular
+  const popular = $("#popularGrid");
+  if (popular && Array.isArray(cfg.popular)) {
+    popular.innerHTML = cfg.popular.map(p => `
+      <div class="sCard">
         <h4>${esc(p.title || "")}</h4>
         <p>${esc(p.text || "")}</p>
       </div>
     `).join("");
   }
 
-  // Price
+  // price + badges
   const fromPrice = $("#fromPrice");
   if (fromPrice) fromPrice.textContent = cfg.fromPrice || "—";
+
   const priceHint = $("#priceHint");
   if (priceHint) priceHint.textContent = cfg.priceHint || "";
 
-  // Badges
   renderTags("#badges", cfg.badges);
   renderTags("#sideBadges", cfg.sideBadges);
 
-  // Services
-  const servicesBlocks = $("#servicesBlocks");
-  if (servicesBlocks && Array.isArray(cfg.services)) {
-    servicesBlocks.innerHTML = cfg.services.map(block => `
+  // services
+  const services = $("#servicesBlocks");
+  if (services && Array.isArray(cfg.services)) {
+    services.innerHTML = cfg.services.map(block => `
       <div class="card list">
         <h3>${esc(block.title || "")}</h3>
         <ul>
@@ -89,11 +90,11 @@
     `).join("");
   }
 
-  // Pricing
-  const pricingCards = $("#pricingCards");
-  if (pricingCards && Array.isArray(cfg.pricing)) {
-    pricingCards.innerHTML = cfg.pricing.map(p => `
-      <div class="card price-card">
+  // pricing
+  const pricing = $("#pricingCards");
+  if (pricing && Array.isArray(cfg.pricing)) {
+    pricing.innerHTML = cfg.pricing.map(p => `
+      <div class="card priceCard">
         <h4>${esc(p.title || "")}</h4>
         <p class="p">${esc(p.text || "")}</p>
         <ul>${(p.bullets || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -101,10 +102,10 @@
     `).join("");
   }
 
-  // FAQ
-  const faqList = $("#faqList");
-  if (faqList && Array.isArray(cfg.faq)) {
-    faqList.innerHTML = cfg.faq.map(f => `
+  // faq
+  const faq = $("#faqList");
+  if (faq && Array.isArray(cfg.faq)) {
+    faq.innerHTML = cfg.faq.map(f => `
       <details>
         <summary>${esc(f.q || "")}</summary>
         <p>${esc(f.a || "")}</p>
@@ -112,13 +113,13 @@
     `).join("");
   }
 
-  // Select
+  // select
   const sel = $("#serviceSelect");
   if (sel && Array.isArray(cfg.serviceOptions)) {
     sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
   }
 
-  // Form -> TG/WA
+  // form -> tg/wa
   const form = $("#leadForm");
   if (form) {
     form.addEventListener("submit", (e) => {
