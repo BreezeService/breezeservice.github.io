@@ -5,8 +5,8 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // bind simple text
-  $$("[data-bind]").forEach(el => {
+  // bind text
+  $$("[data-bind]").forEach((el) => {
     const key = el.getAttribute("data-bind");
     if (cfg[key] != null) el.textContent = cfg[key];
   });
@@ -15,32 +15,35 @@
   const y = $("#year");
   if (y) y.textContent = new Date().getFullYear();
 
-  // helpers
-  const phone = (cfg.phone || "").replace(/\s+/g, "");
+  // contacts
+  const phoneRaw = (cfg.phone || "").replace(/\s+/g, "");
   const phonePretty = cfg.phonePretty || cfg.phone || "";
-  const tg = cfg.telegram || "";
+  const tg = (cfg.telegram || "").trim();
   const waDigits = String(cfg.whatsapp || "").replace(/[^\d]/g, "");
 
-  const setText = (sel, val) => { const el = $(sel); if (el) el.textContent = val; };
+  // helper
+  const setHref = (sel, href) => { const el = $(sel); if (el) el.href = href; };
 
-  setText("#phoneText", phonePretty || "—");
-  setText("#tgText", tg ? `@${tg}` : "—");
-  setText("#waText", waDigits ? `+${waDigits}` : "—");
+  // call => phone app
+  if (phoneRaw) {
+    setHref("#callBtn", `tel:${phoneRaw}`);
+    setHref("#bbCall", `tel:${phoneRaw}`);
+  }
 
-  const callBtn = $("#callBtn");
-  if (callBtn && phone) callBtn.href = `tel:${phone}`;
+  // telegram
+  if (tg) {
+    setHref("#tgBtn", `https://t.me/${tg}`);
+    setHref("#bbTg", `https://t.me/${tg}`);
+    const t = $("#tgText"); if (t) t.textContent = `@${tg}`;
+  }
 
-  const tgBtn = $("#tgBtn");
-  if (tgBtn && tg) tgBtn.href = `https://t.me/${tg}`;
+  // whatsapp
+  if (waDigits) {
+    setHref("#waBtn", `https://wa.me/${waDigits}`);
+    const w = $("#waText"); if (w) w.textContent = `+${waDigits}`;
+  }
 
-  const waBtn = $("#waBtn");
-  if (waBtn && waDigits) waBtn.href = `https://wa.me/${waDigits}`;
-
-  const bbCall = $("#bbCall");
-  if (bbCall && phone) bbCall.href = `tel:${phone}`;
-
-  const bbTg = $("#bbTg");
-  if (bbTg && tg) bbTg.href = `https://t.me/${tg}`;
+  const p = $("#phoneText"); if (p) p.textContent = phonePretty || "—";
 
   // pills
   const pills = $("#heroPills");
@@ -48,11 +51,11 @@
     pills.innerHTML = cfg.heroPills.map(t => `<span class="pill">${esc(t)}</span>`).join("");
   }
 
-  // popular
-  const popular = $("#popularGrid");
-  if (popular && Array.isArray(cfg.popular)) {
-    popular.innerHTML = cfg.popular.map(p => `
-      <div class="sCard">
+  // popular tiles
+  const pop = $("#popularGrid");
+  if (pop && Array.isArray(cfg.popular)) {
+    pop.innerHTML = cfg.popular.map(p => `
+      <div class="tile-item">
         <h4>${esc(p.title || "")}</h4>
         <p>${esc(p.text || "")}</p>
       </div>
@@ -60,20 +63,17 @@
   }
 
   // price + badges
-  const fromPrice = $("#fromPrice");
-  if (fromPrice) fromPrice.textContent = cfg.fromPrice || "—";
+  const from = $("#fromPrice"); if (from) from.textContent = cfg.fromPrice || "—";
+  const hint = $("#priceHint"); if (hint) hint.textContent = cfg.priceHint || "";
 
-  const priceHint = $("#priceHint");
-  if (priceHint) priceHint.textContent = cfg.priceHint || "";
+  renderChips("#badges", cfg.badges);
+  renderChips("#sideBadges", cfg.sideBadges);
 
-  renderTags("#badges", cfg.badges);
-  renderTags("#sideBadges", cfg.sideBadges);
-
-  // services
+  // services blocks
   const services = $("#servicesBlocks");
   if (services && Array.isArray(cfg.services)) {
     services.innerHTML = cfg.services.map(block => `
-      <div class="card list">
+      <div class="card glass block">
         <h3>${esc(block.title || "")}</h3>
         <ul>
           ${(block.items || []).map(it => `
@@ -94,7 +94,7 @@
   const pricing = $("#pricingCards");
   if (pricing && Array.isArray(cfg.pricing)) {
     pricing.innerHTML = cfg.pricing.map(p => `
-      <div class="card priceCard">
+      <div class="card glass priceCard">
         <h4>${esc(p.title || "")}</h4>
         <p class="p">${esc(p.text || "")}</p>
         <ul>${(p.bullets || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -119,7 +119,7 @@
     sel.innerHTML = cfg.serviceOptions.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
   }
 
-  // form -> tg/wa
+  // form -> TG/WA
   const form = $("#leadForm");
   if (form) {
     form.addEventListener("submit", (e) => {
@@ -141,10 +141,28 @@
     });
   }
 
-  function renderTags(sel, arr){
+  // ✅ Fix anchor scroll under sticky nav + smooth iOS-like easing
+  const NAV_OFFSET = 104; // slightly more than nav height for safe space
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener("click", (e) => {
+      const id = a.getAttribute("href");
+      if (!id || id === "#" || id === "#top") return;
+
+      const target = document.querySelector(id);
+      if (!target) return;
+
+      e.preventDefault();
+      const y = target.getBoundingClientRect().top + window.pageYOffset - NAV_OFFSET;
+
+      window.scrollTo({ top: y, behavior: "smooth" });
+      history.pushState(null, "", id);
+    });
+  });
+
+  function renderChips(sel, arr){
     const el = $(sel);
     if (!el || !Array.isArray(arr)) return;
-    el.innerHTML = arr.map(t => `<span class="badge">${esc(t)}</span>`).join("");
+    el.innerHTML = arr.map(t => `<span class="chip2">${esc(t)}</span>`).join("");
   }
 
   function buildText(cfg, d){
