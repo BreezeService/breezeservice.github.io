@@ -1,247 +1,281 @@
 <!doctype html>
-<html lang="ru" data-theme="light" data-lang="ru">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#F5F9FC" />
+  <meta name="theme-color" content="#eaf7ff" />
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
-  <meta name="description" content="BreezeService — установка, чистка, ремонт, диагностика и заправка фреоном в Ташкенте." />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
+  <link rel="icon" href="./logo.png" />
+  <link rel="apple-touch-icon" href="./logo.png" />
   <link rel="stylesheet" href="./styles.css?v=3" />
 </head>
 
 <body>
-  <!-- BACKGROUND WIND LAYERS -->
+  <!-- Background “wind” layers (always moving) -->
   <div class="bg-wind" aria-hidden="true">
-    <span class="wind w1"></span>
-    <span class="wind w2"></span>
-    <span class="wind w3"></span>
-    <span class="wind w4"></span>
+    <div class="wind w1"></div>
+    <div class="wind w2"></div>
+    <div class="wind w3"></div>
+    <div class="grain"></div>
   </div>
 
-  <!-- TOP NAV -->
-  <header class="nav">
-    <div class="wrap nav-inner glass">
-      <a class="brand" href="#top" aria-label="BreezeService">
-        <img class="brand-logo" src="./logo.png" alt="BreezeService logo" />
-        <div class="brand-text">
-          <div class="brand-name" data-i18n="brandName"></div>
-          <div class="brand-sub" data-i18n="brandSub"></div>
-        </div>
+  <!-- Top glass bar -->
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="#top" aria-label="BreezeService — на главную">
+        <span class="brand__logoWrap">
+          <img src="./logo.png" alt="BreezeService logo" class="brand__logo" />
+        </span>
+        <span class="brand__text">
+          <span class="brand__name" data-i18n="brandName">BreezeService</span>
+          <span class="brand__sub" data-i18n="brandSub">Сервис кондиционеров • Ташкент</span>
+        </span>
       </a>
 
-      <nav class="nav-links" aria-label="Навигация">
-        <a class="nav-link" href="#services" data-i18n="nav.services"></a>
-        <a class="nav-link" href="#pricing" data-i18n="nav.pricing"></a>
-        <a class="nav-link" href="#faq" data-i18n="nav.faq"></a>
-        <a class="nav-link" href="#contact" data-i18n="nav.request"></a>
-      </nav>
-
-      <div class="nav-right">
-        <!-- Language switch (glass) -->
+      <div class="controls">
         <div class="seg glass" role="group" aria-label="Language">
-          <button class="seg-btn" type="button" data-lang-btn="ru">RU</button>
-          <button class="seg-btn" type="button" data-lang-btn="en">EN</button>
-          <button class="seg-btn" type="button" data-lang-btn="uz">UZ</button>
+          <button class="seg__btn" data-lang="ru" type="button">RU</button>
+          <button class="seg__btn" data-lang="en" type="button">EN</button>
+          <button class="seg__btn" data-lang="uz" type="button">UZ</button>
+          <span class="seg__pill" aria-hidden="true"></span>
         </div>
 
-        <!-- Theme switch (glass) -->
-        <button class="theme-toggle glass" id="themeToggle" type="button" aria-label="Toggle theme">
-          <span class="theme-dot" aria-hidden="true"></span>
-          <span class="theme-label" data-i18n="ui.theme"></span>
+        <button class="theme glass" type="button" id="themeBtn" aria-label="Toggle theme">
+          <span class="ico" aria-hidden="true" id="themeIco"></span>
+          <span class="theme__txt" data-i18n="theme">Тема</span>
         </button>
 
-        <div class="nav-cta">
-          <a class="btn glass" id="callBtnTop" href="#" data-i18n="cta.call"></a>
-          <a class="btn primary" href="#contact" data-i18n="cta.request"></a>
+        <div class="actions">
+          <a class="btn glass btn--icon" id="callTop" href="tel:+998910094469">
+            <span class="ico" aria-hidden="true" data-ico="phone"></span>
+            <span data-i18n="call">Позвонить</span>
+          </a>
+          <a class="btn btn--primary" href="#request" id="goRequest">
+            <span class="ico" aria-hidden="true" data-ico="spark"></span>
+            <span data-i18n="request">Заявка</span>
+          </a>
         </div>
       </div>
     </div>
   </header>
 
-  <main id="top" class="wrap">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="card glass hero-left rgb-hover">
-        <div class="hero-kicker" data-i18n="hero.kicker"></div>
-        <h1 class="hero-title" data-i18n="hero.title"></h1>
-        <p class="lead" data-i18n="hero.lead"></p>
+  <main id="top">
+    <section class="hero container">
+      <div class="card glass glow">
+        <div class="card__inner">
+          <div class="kicker" data-i18n="kicker">ТАШКЕНТ • КЛИМАТ-СЕРВИС</div>
 
-        <div class="pill-row" id="heroPills"></div>
+          <h1 class="h1" data-i18n="heroTitle">
+            BreezeService — сервис кондиционеров в Ташкенте
+          </h1>
 
-        <div class="hero-actions">
-          <a class="btn primary" href="#contact" data-i18n="cta.request"></a>
-          <a class="btn glass" id="callBtnHero" href="#" data-i18n="cta.call"></a>
-        </div>
+          <p class="lead" data-i18n="heroLead">
+            Помогаем частным клиентам и объектам любого масштаба: от чистки до установки и ремонта.
+            Один звонок — консультация — выезд мастера без лишних сложностей.
+          </p>
 
-        <div class="social-row">
-          <a class="btn glass social" id="tgBtn" href="#" rel="noopener" target="_blank">
-            <span class="ico">✈️</span><span data-i18n="social.telegram"></span>
-          </a>
-          <a class="btn glass social" id="waBtn" href="#" rel="noopener" target="_blank">
-            <span class="ico">💬</span><span data-i18n="social.whatsapp"></span>
-          </a>
-          <a class="btn glass social" id="igBtn" href="#" rel="noopener" target="_blank">
-            <span class="ico">📸</span><span data-i18n="social.instagram"></span>
-          </a>
-        </div>
-
-        <div class="mini">
-          <span><span class="dot ok"></span><span data-i18n="hero.badge1"></span></span>
-          <span><span class="dot warn"></span><span data-i18n="hero.badge2"></span></span>
-        </div>
-      </div>
-
-      <aside class="card glass hero-right rgb-hover">
-        <div class="inset glass">
-          <h3 data-i18n="hero.fromPriceTitle"></h3>
-          <div class="price" data-i18n="hero.fromPrice"></div>
-          <p class="muted" data-i18n="hero.priceNote"></p>
-        </div>
-
-        <div class="grid3" id="popularCards"></div>
-
-        <div class="badges" id="sideBadges"></div>
-      </aside>
-    </section>
-
-    <!-- SERVICES -->
-    <section id="services">
-      <div class="section-title">
-        <h2 data-i18n="services.title"></h2>
-        <p data-i18n="services.lead"></p>
-      </div>
-
-      <div class="two" id="servicesLists"></div>
-
-      <div class="note glass rgb-hover" data-i18n="services.note"></div>
-    </section>
-
-    <!-- PRICING -->
-    <section id="pricing">
-      <div class="section-title">
-        <h2 data-i18n="pricing.title"></h2>
-        <p data-i18n="pricing.lead"></p>
-      </div>
-
-      <div class="pricing" id="pricingCards"></div>
-      <div class="note" data-i18n="pricing.note"></div>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq">
-      <div class="section-title">
-        <h2 data-i18n="faq.title"></h2>
-        <p data-i18n="faq.lead"></p>
-      </div>
-
-      <div class="faq" id="faqList"></div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-      <div class="section-title">
-        <h2 data-i18n="contact.title"></h2>
-        <p data-i18n="contact.lead"></p>
-      </div>
-
-      <div class="contact">
-        <form class="card glass form rgb-hover" id="leadForm">
-          <div class="form-row">
-            <div>
-              <label for="name" data-i18n="form.name"></label>
-              <input id="name" name="name" autocomplete="name" placeholder="" />
-            </div>
-            <div>
-              <label for="phone" data-i18n="form.phone"></label>
-              <input id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="+998 __ ___ __ __" />
-            </div>
+          <!-- Service chips (looks “wooden” before -> now glass chips) -->
+          <div class="chips" id="chips">
+            <!-- injected by site.js -->
           </div>
 
-          <label for="service" data-i18n="form.service"></label>
-          <select id="service" name="service"></select>
+          <div class="ctaRow">
+            <a class="btn btn--primary" href="#request">
+              <span class="ico" aria-hidden="true" data-ico="spark"></span>
+              <span data-i18n="leaveRequest">Оставить заявку</span>
+            </a>
 
-          <label for="msg" data-i18n="form.comment"></label>
-          <textarea id="msg" name="msg" placeholder=""></textarea>
-
-          <div class="hero-actions">
-            <button class="btn primary" type="submit" data-i18n="form.sendWhatsapp"></button>
-            <button class="btn glass" id="sendTelegram" type="button" data-i18n="form.sendTelegram"></button>
+            <a class="btn glass btn--icon" href="tel:+998910094469">
+              <span class="ico" aria-hidden="true" data-ico="phone"></span>
+              <span data-i18n="call">Позвонить</span>
+            </a>
           </div>
 
-          <p class="muted small" data-i18n="form.hint"></p>
+          <div class="socialRow">
+            <a class="btn glass btn--icon" id="tgBtn" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="tg"></span>
+              <span>Telegram</span>
+            </a>
+            <a class="btn glass btn--icon" id="waBtn" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="wa"></span>
+              <span>WhatsApp</span>
+            </a>
+            <a class="btn glass btn--icon" id="igBtn" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="ig"></span>
+              <span>Instagram</span>
+            </a>
+          </div>
+
+          <ul class="bullets">
+            <li><span class="dot dot--ok" aria-hidden="true"></span><span data-i18n="bullet1">Гарантия на установку — 1 год</span></li>
+            <li><span class="dot dot--warn" aria-hidden="true"></span><span data-i18n="bullet2">Оплата по факту выполненной работы</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" id="pricing">
+      <div class="sectionHead">
+        <h2 class="h2" data-i18n="pricingTitle">Стоимость</h2>
+        <p class="muted" data-i18n="pricingLead">
+          Стоимость не фиксирована — зависит от сложности, количества кондиционеров и условий монтажа.
+        </p>
+      </div>
+
+      <div class="grid grid--3">
+        <article class="tile glass glow">
+          <h3 class="h3" data-i18n="p1Title">Установка</h3>
+          <p class="muted" data-i18n="p1Text">Аккуратный монтаж и запуск.</p>
+          <ul class="list">
+            <li data-i18n="p1b1">Подбор решения</li>
+            <li data-i18n="p1b2">Проверка запуска</li>
+            <li data-i18n="p1b3">Гарантия 1 год</li>
+          </ul>
+        </article>
+
+        <article class="tile glass glow">
+          <h3 class="h3" data-i18n="p2Title">Чистка</h3>
+          <p class="muted" data-i18n="p2Text">Для запаха и падения мощности.</p>
+          <ul class="list">
+            <li data-i18n="p2b1">Чистка блоков</li>
+            <li data-i18n="p2b2">Проверка работы</li>
+            <li data-i18n="p2b3">Рекомендации</li>
+          </ul>
+        </article>
+
+        <article class="tile glass glow">
+          <h3 class="h3" data-i18n="p3Title">Ремонт / Диагностика</h3>
+          <p class="muted" data-i18n="p3Text">Не холодит / шумит / капает.</p>
+          <ul class="list">
+            <li data-i18n="p3b1">Диагностика</li>
+            <li data-i18n="p3b2">Согласование цены</li>
+            <li data-i18n="p3b3">Ремонт по факту</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="note glass">
+        <span class="tag" data-i18n="noteTag">Важно</span>
+        <span class="muted" data-i18n="noteText">Перед выездом вы всегда получаете предварительную консультацию по телефону.</span>
+      </div>
+    </section>
+
+    <section class="container" id="faq">
+      <div class="sectionHead">
+        <h2 class="h2">FAQ</h2>
+        <p class="muted" data-i18n="faqLead">Гарантии и частые вопросы.</p>
+      </div>
+
+      <div class="accordion glass glow" id="accordion">
+        <!-- injected by site.js -->
+      </div>
+    </section>
+
+    <section class="container" id="request">
+      <div class="sectionHead">
+        <h2 class="h2" data-i18n="formTitle">Заявка</h2>
+        <p class="muted" data-i18n="formLead">Заполни форму — откроем мессенджер с готовым текстом.</p>
+      </div>
+
+      <div class="grid grid--2">
+        <form class="form glass glow" id="reqForm">
+          <div class="row">
+            <label class="label" for="name" data-i18n="name">Имя</label>
+            <input class="input" id="name" name="name" autocomplete="name" placeholder="Ваше имя" />
+          </div>
+
+          <div class="row">
+            <label class="label" for="phone" data-i18n="phone">Телефон</label>
+            <input class="input" id="phone" name="phone" inputmode="tel" placeholder="+998…" />
+          </div>
+
+          <div class="row">
+            <label class="label" for="service" data-i18n="service">Услуга</label>
+            <select class="input" id="service" name="service"></select>
+          </div>
+
+          <div class="row">
+            <label class="label" for="msg" data-i18n="comment">Комментарий</label>
+            <textarea class="input textarea" id="msg" name="msg" placeholder="Например: не холодит, капает, нужна чистка…"></textarea>
+          </div>
+
+          <div class="ctaRow">
+            <button class="btn btn--primary" type="submit" id="sendWA">
+              <span class="ico" aria-hidden="true" data-ico="wa"></span>
+              <span data-i18n="sendWA">Отправить в WhatsApp</span>
+            </button>
+
+            <button class="btn glass" type="button" id="sendTG">
+              <span class="ico" aria-hidden="true" data-ico="tg"></span>
+              <span data-i18n="sendTG">Отправить в Telegram</span>
+            </button>
+          </div>
+
+          <p class="small muted" data-i18n="privacy">
+            Нажимая кнопку, вы откроете мессенджер с готовым сообщением (данные не отправляются на сервер).
+          </p>
         </form>
 
-        <aside class="card glass side rgb-hover">
-          <h3 data-i18n="contact.boxTitle"></h3>
-          <p class="muted" data-i18n="contact.boxLead"></p>
-
-          <div class="info">
-            <div class="info-row">
-              <div class="info-k" data-i18n="contact.phone"></div>
-              <div class="info-v"><a id="phoneLink" href="#" class="link"></a></div>
-            </div>
-
-            <div class="info-row">
-              <div class="info-k" data-i18n="contact.hours"></div>
-              <div class="info-v" data-i18n="contact.hoursValue"></div>
-            </div>
-
-            <div class="info-row">
-              <div class="info-k" data-i18n="contact.area"></div>
-              <div class="info-v" data-i18n="contact.areaValue"></div>
-            </div>
+        <aside class="side glass glow">
+          <h3 class="h3" data-i18n="contacts">Контакты</h3>
+          <div class="kv">
+            <span class="kv__k" data-i18n="phone">Телефон</span>
+            <a class="kv__v" href="tel:+998910094469">+998 91 009 44 69</a>
+          </div>
+          <div class="kv">
+            <span class="kv__k" data-i18n="hours">График</span>
+            <span class="kv__v" data-i18n="hoursVal">10:00–18:00</span>
+          </div>
+          <div class="kv">
+            <span class="kv__k" data-i18n="geo">География</span>
+            <span class="kv__v" data-i18n="geoVal">Ташкент • выезд за город 1–2 км</span>
           </div>
 
-          <div class="badges" id="contactBadges"></div>
+          <div class="socialRow socialRow--stack">
+            <a class="btn glass btn--icon" id="tgBtn2" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="tg"></span><span>Telegram</span>
+            </a>
+            <a class="btn glass btn--icon" id="waBtn2" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="wa"></span><span>WhatsApp</span>
+            </a>
+            <a class="btn glass btn--icon" id="igBtn2" target="_blank" rel="noopener">
+              <span class="ico" aria-hidden="true" data-ico="ig"></span><span>Instagram</span>
+            </a>
+          </div>
 
-          <div class="social-row">
-            <a class="btn glass social" id="tgBtn2" href="#" rel="noopener" target="_blank">
-              <span class="ico">✈️</span><span data-i18n="social.telegram"></span>
-            </a>
-            <a class="btn glass social" id="waBtn2" href="#" rel="noopener" target="_blank">
-              <span class="ico">💬</span><span data-i18n="social.whatsapp"></span>
-            </a>
-            <a class="btn glass social" id="igBtn2" href="#" rel="noopener" target="_blank">
-              <span class="ico">📸</span><span data-i18n="social.instagram"></span>
-            </a>
+          <div class="miniBadges">
+            <span class="badge" data-i18n="b1">Быстрый отклик</span>
+            <span class="badge" data-i18n="b2">Проверенные мастера</span>
+            <span class="badge" data-i18n="b3">Честные условия</span>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- FOOTER (FIXED: NO DUPLICATE) -->
-    <footer class="footer">
-      <div class="footer-inner glass">
-        <div class="foot-left">
-          <span class="foot-copy" id="copyright"></span>
-          <span class="foot-dot">•</span>
-          <a class="foot-link" href="#top" data-i18n="footer.up"></a>
-        </div>
-        <div class="foot-right">
-          <a class="foot-link" id="footIG" href="#" rel="noopener" target="_blank">Instagram</a>
-          <span class="foot-dot">•</span>
-          <a class="foot-link" id="footTG" href="#" rel="noopener" target="_blank">Telegram</a>
-        </div>
-      </div>
-    </footer>
-
-    <!-- MOBILE DOCK -->
-    <div class="dock">
-      <div class="dock-inner glass">
-        <a class="dock-btn" href="#" id="dockCall" data-i18n="cta.call"></a>
-        <a class="dock-btn" href="#" id="dockTG" data-i18n="social.telegram"></a>
-        <a class="dock-btn primary" href="#contact" data-i18n="cta.request"></a>
-      </div>
-    </div>
+    <!-- Bottom dock (mobile) -->
+    <nav class="dock glass" aria-label="Quick actions">
+      <a class="dock__btn" href="tel:+998910094469">
+        <span class="ico" aria-hidden="true" data-ico="phone"></span>
+        <span data-i18n="call">Позвонить</span>
+      </a>
+      <a class="dock__btn" id="dockTG" target="_blank" rel="noopener">
+        <span class="ico" aria-hidden="true" data-ico="tg"></span>
+        <span>Telegram</span>
+      </a>
+      <a class="dock__btn dock__btn--primary" href="#request">
+        <span class="ico" aria-hidden="true" data-ico="spark"></span>
+        <span data-i18n="request">Заявка</span>
+      </a>
+    </nav>
   </main>
 
-  <!-- ВАЖНО: config первым, потом site -->
+  <footer class="footer container">
+    <span>© <span id="y"></span> <span data-i18n="brandName">BreezeService</span></span>
+    <span class="muted" data-i18n="footerLine">Сервис кондиционеров в Ташкенте</span>
+  </footer>
+
+  <!-- IMPORTANT: config first, then site -->
   <script src="./config.js?v=3"></script>
   <script src="./site.js?v=3"></script>
 </body>
-</html>
+  </html>
