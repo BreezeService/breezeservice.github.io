@@ -1,390 +1,370 @@
 (() => {
-  const cfg = window.SITE_CONFIG || {};
+  const CFG = window.SITE_CONFIG;
+  if (!CFG) {
+    console.error("SITE_CONFIG not found (config.js).");
+    return;
+  }
 
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const LS_THEME = "bs_theme";
+  const LS_LANG = "bs_lang";
 
-  function safeText(v) { return (v ?? "").toString(); }
+  const html = document.documentElement;
 
-  function setBindTexts() {
-    $$("[data-bind]").forEach(el => {
-      const key = el.getAttribute("data-bind");
-      if (!key) return;
-      if (cfg[key] == null) return;
-      el.textContent = safeText(cfg[key]);
+  // ---- THEME ----
+  function getInitialTheme() {
+    const saved = localStorage.getItem(LS_THEME);
+    if (saved === "light" || saved === "dark") return saved;
+    // system fallback
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return prefersDark ? "dark" : "light";
+  }
+
+  function setTheme(theme, persist = true) {
+    html.setAttribute("data-theme", theme);
+    html.querySelector('meta[name="theme-color"]')?.setAttribute(
+      "content",
+      theme === "dark" ? "#05070d" : "#F5F9FC"
+    );
+    if (persist) localStorage.setItem(LS_THEME, theme);
+  }
+
+  // ---- LANGUAGE ----
+  function getInitialLang() {
+    const saved = localStorage.getItem(LS_LANG);
+    if (saved && ["ru","en","uz"].includes(saved)) return saved;
+    return "ru";
+  }
+
+  function setLang(lang, persist = true) {
+    html.setAttribute("data-lang", lang);
+    html.lang = lang;
+    if (persist) localStorage.setItem(LS_LANG, lang);
+    applyI18n(lang);
+    renderDynamic(lang);
+    updateActiveLangButtons(lang);
+  }
+
+  function t(lang, key) {
+    const dict = CFG.i18n[lang] || CFG.i18n.ru;
+    return key.split(".").reduce((acc, k) => (acc && acc[k] != null ? acc[k] : null), dict);
+  }
+
+  function applyI18n(lang) {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      const val = t(lang, key);
+      if (val == null) return;
+      el.textContent = String(val);
+    });
+
+    // placeholders
+    const name = document.getElementById("name");
+    const msg = document.getElementById("msg");
+    if (name) name.placeholder = t(lang, "form.name") || "";
+    if (msg) msg.placeholder = t(lang, "form.comment") || "";
+  }
+
+  function updateActiveLangButtons(lang) {
+    document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-lang-btn") === lang);
     });
   }
 
-  function addGlassLayers() {
-    // Add inner wind + highlight to every .glass (one-time)
-    $$(".glass").forEach(card => {
-      // avoid duplicates
-      if (card.querySelector(".inner-wind")) return;
+  // ---- LINKS (correct) ----
+  function wireLinks() {
+    const telHref = `tel:${CFG.phone}`;
+    const callBtns = ["callBtnTop", "callBtnHero", "dockCall"].map(id => document.getElementById(id)).filter(Boolean);
+    callBtns.forEach(a => a.setAttribute("href", telHref));
 
-      const inner = document.createElement("div");
-      inner.className = "inner-wind";
-
-      const hi = document.createElement("div");
-      hi.className = "glass-highlight";
-
-      card.prepend(inner);
-      card.prepend(hi);
-    });
-  }
-
-  function renderChips(container, options, onPick, defaultValue) {
-    container.innerHTML = "";
-    options.forEach((name, idx) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "seg-chip";
-      b.textContent = name;
-
-      if ((defaultValue && name === defaultValue) || (!defaultValue && idx === 0)) {
-        b.classList.add("active");
-      }
-
-      b.addEventListener("click", () => {
-        container.querySelectorAll(".seg-chip").forEach(x => x.classList.remove("active"));
-        b.classList.add("active");
-        onPick(name);
-      });
-
-      container.appendChild(b);
-    });
-
-    // init selected
-    const active = container.querySelector(".seg-chip.active");
-    if (active) onPick(active.textContent);
-  }
-
-  function renderPopular() {
-    const grid = $("#popularGrid");
-    if (!grid) return;
-
-    const items = Array.isArray(cfg.popular) ? cfg.popular : [];
-    grid.innerHTML = "";
-
-    items.forEach(it => {
-      const d = document.createElement("div");
-      d.className = "tile-item";
-      d.innerHTML = `
-        <h4>${safeText(it.title)}</h4>
-        <p>${safeText(it.text)}</p>
-      `;
-      grid.appendChild(d);
-    });
-  }
-
-  function renderServices() {
-    const host = $("#servicesBlocks");
-    if (!host) return;
-
-    const blocks = Array.isArray(cfg.services) ? cfg.services : [];
-    host.innerHTML = "";
-
-    blocks.forEach(block => {
-      const card = document.createElement("div");
-      card.className = "card glass block";
-      card.innerHTML = `
-        <h3>${safeText(block.title)}</h3>
-        <ul>
-          ${(block.items || []).map(x => `
-            <li class="li">
-              <span class="check"></span>
-              <div>
-                <b>${safeText(x.b)}</b>
-                <span>${safeText(x.s)}</span>
-              </div>
-            </li>
-          `).join("")}
-        </ul>
-      `;
-      host.appendChild(card);
-    });
-  }
-
-  function renderPricing() {
-    const host = $("#pricingCards");
-    if (!host) return;
-
-    const cards = Array.isArray(cfg.pricing) ? cfg.pricing : [];
-    host.innerHTML = "";
-
-    cards.forEach(p => {
-      const el = document.createElement("div");
-      el.className = "card glass priceCard";
-      el.innerHTML = `
-        <div class="tile-head">
-          <h4>${safeText(p.title)}</h4>
-          <span class="chip">${safeText(p.tag)}</span>
-        </div>
-        <p class="p">${safeText(p.text)}</p>
-        <div class="price">${safeText(p.cost)}</div>
-        <ul>
-          ${(p.bullets || []).map(b => `<li>${safeText(b)}</li>`).join("")}
-        </ul>
-      `;
-      host.appendChild(el);
-    });
-  }
-
-  // Smooth FAQ animation: height transitions to scrollHeight
-  function renderFAQ() {
-    const host = $("#faqList");
-    if (!host) return;
-
-    const list = Array.isArray(cfg.faq) ? cfg.faq : [];
-    host.innerHTML = "";
-
-    list.forEach((f, i) => {
-      const item = document.createElement("div");
-      item.className = "card glass faq-item";
-
-      item.innerHTML = `
-        <div class="faq-q" role="button" aria-expanded="false" tabindex="0">
-          <span>${safeText(f.q)}</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a" aria-hidden="true">
-          <div class="faq-a-inner">${safeText(f.a)}</div>
-        </div>
-      `;
-
-      const q = $(".faq-q", item);
-      const a = $(".faq-a", item);
-
-      const toggle = () => {
-        const isOpen = item.classList.contains("open");
-        // close all others (nice UX)
-        $$(".faq-item.open").forEach(x => {
-          if (x === item) return;
-          x.classList.remove("open");
-          const ax = $(".faq-a", x);
-          const qx = $(".faq-q", x);
-          if (ax) ax.style.height = "0px";
-          if (qx) {
-            qx.setAttribute("aria-expanded", "false");
-            const icon = $(".faq-icon", x);
-            if (icon) icon.textContent = "+";
-          }
-        });
-
-        if (!isOpen) {
-          item.classList.add("open");
-          q.setAttribute("aria-expanded", "true");
-          const inner = $(".faq-a-inner", item);
-          const h = inner ? inner.scrollHeight : 0;
-          a.style.height = h + "px";
-          const icon = $(".faq-icon", item);
-          if (icon) icon.textContent = "×";
-        } else {
-          item.classList.remove("open");
-          q.setAttribute("aria-expanded", "false");
-          a.style.height = "0px";
-          const icon = $(".faq-icon", item);
-          if (icon) icon.textContent = "+";
-        }
-      };
-
-      q.addEventListener("click", toggle);
-      q.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle();
-        }
-      });
-
-      host.appendChild(item);
-    });
-  }
-
-  function setContacts() {
-    const phone = safeText(cfg.phone || "");
-    const phonePretty = safeText(cfg.phonePretty || phone);
-
-    // phone
-    const phoneLink = $("#phoneLink");
+    const phoneLink = document.getElementById("phoneLink");
     if (phoneLink) {
-      phoneLink.href = `tel:${phone}`;
-      phoneLink.textContent = phonePretty || phone;
+      phoneLink.textContent = CFG.phonePretty;
+      phoneLink.href = telHref;
     }
 
-    // hours/areas
-    const hoursText = $("#hoursText");
-    if (hoursText) hoursText.textContent = safeText(cfg.hours || "");
-    const areasText = $("#areasText");
-    if (areasText) areasText.textContent = safeText(cfg.areas || "");
+    // socials
+    const tg = [document.getElementById("tgBtn"), document.getElementById("tgBtn2"), document.getElementById("dockTG"), document.getElementById("footTG")].filter(Boolean);
+    tg.forEach(a => a.href = CFG.telegramUrl);
 
-    // telegram / whatsapp / instagram
-    const tgUrl = safeText(cfg.telegramUrl || "");
-    const waMe = safeText(cfg.whatsappWaMe || "");
-    const igUrl = safeText(cfg.instagramUrl || "");
-    const igHandle = safeText(cfg.instagramHandle || "");
+    const wa = [document.getElementById("waBtn"), document.getElementById("waBtn2")].filter(Boolean);
+    wa.forEach(a => a.href = CFG.whatsappUrl);
 
-    const tgBtns = [$("#tgBtn"), $("#bbTg"), $("#tgText")].filter(Boolean);
-    tgBtns.forEach(el => {
-      el.href = tgUrl || "#";
-      // tgText content already in HTML, keep it
-    });
+    const ig = [document.getElementById("igBtn"), document.getElementById("igBtn2"), document.getElementById("footIG")].filter(Boolean);
+    ig.forEach(a => a.href = CFG.instagramUrl);
 
-    const waUrl = waMe ? `https://wa.me/${waMe}` : "#";
-    const waBtns = [$("#waBtn"), $("#waText")].filter(Boolean);
-    waBtns.forEach(el => el.href = waUrl);
-
-    const igBtns = [$("#igBtn"), $("#igText")].filter(Boolean);
-    igBtns.forEach(el => el.href = igUrl || "#");
-    if ($("#igText")) $("#igText").textContent = igHandle ? `@${igHandle}` : "@instagram";
-
-    // call buttons
-    const callTop = $("#callBtnTop");
-    const bbCall = $("#bbCall");
-    if (callTop) callTop.href = `tel:${phone}`;
-    if (bbCall) bbCall.href = `tel:${phone}`;
-
-    // top pricing hints
-    const fromPrice = $("#fromPrice");
-    if (fromPrice) fromPrice.textContent = safeText(cfg.fromPrice || "—");
-    const priceHint = $("#priceHint");
-    if (priceHint) priceHint.textContent = safeText(cfg.priceHint || "");
+    // footer copyright once
+    const c = document.getElementById("copyright");
+    if (c) c.textContent = `© ${new Date().getFullYear()} BreezeService`;
   }
 
-  function setBadges() {
-    const badges = $("#badges");
-    if (badges) {
-      badges.innerHTML = "";
-      (cfg.badges || []).forEach(t => {
-        const s = document.createElement("span");
-        s.className = "chip2";
-        s.textContent = safeText(t);
-        badges.appendChild(s);
+  // ---- DYNAMIC RENDER ----
+  function renderDynamic(lang) {
+    // hero pills
+    const pillsWrap = document.getElementById("heroPills");
+    if (pillsWrap) {
+      pillsWrap.innerHTML = "";
+      const arr = (t(lang, "hero.pills") || []);
+      arr.forEach(text => {
+        const el = document.createElement("span");
+        el.className = "pill";
+        el.textContent = text;
+        pillsWrap.appendChild(el);
       });
     }
-    const side = $("#sideBadges");
+
+    // popular
+    const popular = document.getElementById("popularCards");
+    if (popular) {
+      popular.innerHTML = "";
+      const items = t(lang, "popular") || [];
+      items.forEach(it => {
+        const card = document.createElement("div");
+        card.className = "s-card glass rgb-hover";
+        card.innerHTML = `<h4>${escapeHtml(it.title)}</h4><p>${escapeHtml(it.text)}</p>`;
+        popular.appendChild(card);
+      });
+    }
+
+    // side badges
+    const side = document.getElementById("sideBadges");
     if (side) {
       side.innerHTML = "";
-      (cfg.sideBadges || []).forEach(t => {
-        const s = document.createElement("span");
-        s.className = "chip2";
-        s.textContent = safeText(t);
-        side.appendChild(s);
+      const list = (t(lang, "contact.badges") || []);
+      list.slice(0, 3).forEach(x => {
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.textContent = x;
+        side.appendChild(b);
+      });
+    }
+
+    // services lists
+    const lists = document.getElementById("servicesLists");
+    if (lists) {
+      lists.innerHTML = "";
+      const blocks = t(lang, "services.lists") || [];
+      blocks.forEach(block => {
+        const wrap = document.createElement("div");
+        wrap.className = "card glass list rgb-hover";
+        const ul = document.createElement("ul");
+        block.items.forEach(it => {
+          const li = document.createElement("li");
+          li.className = "li";
+          li.innerHTML = `<span class="check"></span><div><b>${escapeHtml(it.b)}</b><span>${escapeHtml(it.s)}</span></div>`;
+          ul.appendChild(li);
+        });
+
+        wrap.innerHTML = `<h3>${escapeHtml(block.title)}</h3>`;
+        wrap.appendChild(ul);
+        lists.appendChild(wrap);
+      });
+    }
+
+    // pricing
+    const pricing = document.getElementById("pricingCards");
+    if (pricing) {
+      pricing.innerHTML = "";
+      const cards = t(lang, "pricing.cards") || [];
+      cards.forEach(p => {
+        const el = document.createElement("div");
+        el.className = "card glass plan rgb-hover";
+        el.innerHTML = `
+          <div class="tag">${escapeHtml(p.tag)}</div>
+          <h4>${escapeHtml(p.title)}</h4>
+          <p class="p">${escapeHtml(p.text)}</p>
+          <div class="cost">${escapeHtml(p.cost)}</div>
+          <ul>${(p.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+        `;
+        pricing.appendChild(el);
+      });
+    }
+
+    // FAQ smooth
+    const faq = document.getElementById("faqList");
+    if (faq) {
+      faq.innerHTML = "";
+      const items = t(lang, "faq.items") || [];
+      items.forEach((it, idx) => {
+        const card = document.createElement("div");
+        card.className = "faq-item glass rgb-hover";
+        card.setAttribute("data-faq", String(idx));
+        card.innerHTML = `
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">
+            <span>${escapeHtml(it.q)}</span>
+            <span class="chev">▾</span>
+          </div>
+          <div class="faq-a" aria-hidden="true">
+            <p>${escapeHtml(it.a)}</p>
+          </div>
+        `;
+        faq.appendChild(card);
+      });
+
+      // bind
+      faq.querySelectorAll(".faq-item .faq-q").forEach(q => {
+        q.addEventListener("click", () => toggleFaq(q.closest(".faq-item")));
+        q.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleFaq(q.closest(".faq-item"));
+          }
+        });
+      });
+    }
+
+    // service select
+    const select = document.getElementById("service");
+    if (select) {
+      select.innerHTML = "";
+      const opts = (CFG.servicesOptions && CFG.servicesOptions[lang]) || CFG.servicesOptions.ru;
+      opts.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        select.appendChild(o);
+      });
+    }
+
+    // contact badges
+    const cb = document.getElementById("contactBadges");
+    if (cb) {
+      cb.innerHTML = "";
+      const list = (t(lang, "contact.badges") || []);
+      list.forEach(x => {
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.textContent = x;
+        cb.appendChild(b);
       });
     }
   }
 
-  function initServiceSelectors() {
-    const options = Array.isArray(cfg.serviceOptions) ? cfg.serviceOptions : [];
-    if (!options.length) return;
+  function toggleFaq(item) {
+    if (!item) return;
+    const isOpen = item.classList.contains("is-open");
 
-    const serviceHidden = $("#serviceHidden");
+    // close others
+    document.querySelectorAll(".faq-item.is-open").forEach(x => {
+      if (x !== item) {
+        x.classList.remove("is-open");
+        const q = x.querySelector(".faq-q");
+        if (q) q.setAttribute("aria-expanded", "false");
+        const a = x.querySelector(".faq-a");
+        if (a) a.setAttribute("aria-hidden", "true");
+      }
+    });
 
-    // hero chips
-    const heroChips = $("#heroServiceChips");
-    if (heroChips) {
-      renderChips(heroChips, options.slice(0, 6), (val) => {
-        if (serviceHidden && !serviceHidden.value) serviceHidden.value = val;
-      }, options[0]);
-    }
-
-    // form chips
-    const formChips = $("#serviceChips");
-    if (formChips && serviceHidden) {
-      renderChips(formChips, options, (val) => {
-        serviceHidden.value = val;
-      }, options[0]);
-      serviceHidden.value = options[0];
-    }
+    item.classList.toggle("is-open", !isOpen);
+    const q = item.querySelector(".faq-q");
+    const a = item.querySelector(".faq-a");
+    if (q) q.setAttribute("aria-expanded", String(!isOpen));
+    if (a) a.setAttribute("aria-hidden", String(isOpen));
   }
 
-  function buildMessage(formData) {
-    const name = safeText(formData.get("name"));
-    const phone = safeText(formData.get("phone"));
-    const service = safeText(formData.get("service"));
-    const area = safeText(formData.get("area"));
-    const comment = safeText(formData.get("comment"));
-
-    const lines = [
-      "Заявка BreezeService",
-      "",
-      `Имя: ${name}`,
-      `Телефон: ${phone}`,
-      `Услуга: ${service}`,
-      area ? `Адрес/район: ${area}` : null,
-      comment ? `Комментарий: ${comment}` : null
-    ].filter(Boolean);
-
-    return lines.join("\n");
-  }
-
-  function initForm() {
-    const form = $("#leadForm");
+  // ---- FORM -> open messenger with ready text ----
+  function wireForm(lang) {
+    const form = document.getElementById("leadForm");
+    const tgBtn = document.getElementById("sendTelegram");
     if (!form) return;
 
-    const tgUrl = safeText(cfg.telegramUrl || "");
-    const waMe = safeText(cfg.whatsappWaMe || "");
-    const waUrl = waMe ? `https://wa.me/${waMe}` : "";
+    const buildMessage = () => {
+      const name = (document.getElementById("name")?.value || "").trim();
+      const phone = (document.getElementById("phone")?.value || "").trim();
+      const service = (document.getElementById("service")?.value || "").trim();
+      const msg = (document.getElementById("msg")?.value || "").trim();
+
+      // short + clean
+      const lines = [];
+      lines.push(`BreezeService — ${t(lang, "contact.title")}`);
+      if (name) lines.push(`${t(lang, "form.name")}: ${name}`);
+      if (phone) lines.push(`${t(lang, "form.phone")}: ${phone}`);
+      if (service) lines.push(`${t(lang, "form.service")}: ${service}`);
+      if (msg) lines.push(`${t(lang, "form.comment")}: ${msg}`);
+      return lines.join("\n");
+    };
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const fd = new FormData(form);
-      const msg = buildMessage(fd);
-
-      // Telegram: open chat link + prefill text via ?text=... is not standard for channels,
-      // so we open tgUrl and also copy text to clipboard best-effort.
-      // (Works reliably across browsers.)
-      try {
-        navigator.clipboard?.writeText(msg);
-      } catch {}
-      if (tgUrl) window.open(tgUrl, "_blank");
-      else alert(msg);
+      const text = encodeURIComponent(buildMessage());
+      // WhatsApp
+      const wa = CFG.whatsappUrl || `https://wa.me/${CFG.phone.replace(/\D/g, "")}`;
+      window.open(`${wa}?text=${text}`, "_blank", "noopener");
     });
 
-    const sendWA = $("#sendWA");
-    if (sendWA) {
-      sendWA.addEventListener("click", () => {
-        const fd = new FormData(form);
-        const msg = encodeURIComponent(buildMessage(fd));
-        if (waUrl) window.open(`${waUrl}?text=${msg}`, "_blank");
+    tgBtn?.addEventListener("click", () => {
+      const text = encodeURIComponent(buildMessage());
+      const tg = CFG.telegramUrl || "https://t.me/";
+      // If tg is channel link - open it, message user manually.
+      // We'll open Telegram link + put message into clipboard for convenience.
+      copyToClipboard(decodeURIComponent(text));
+      window.open(tg, "_blank", "noopener");
+      // tiny feedback
+      tgBtn.textContent = "✓ Copied";
+      setTimeout(() => tgBtn.textContent = t(getLang(), "form.sendTelegram"), 900);
+    });
+  }
+
+  function getLang(){ return html.getAttribute("data-lang") || "ru"; }
+
+  async function copyToClipboard(text){
+    try { await navigator.clipboard.writeText(text); } catch {}
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ---- Smooth scroll (fix “half letters cut” / jumpy) ----
+  function wireSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener("click", (e) => {
+        const href = a.getAttribute("href");
+        if (!href || href === "#") return;
+        const el = document.querySelector(href);
+        if (!el) return;
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", href);
+      }, { passive: false });
+    });
+  }
+
+  // ---- UI binds ----
+  function wireThemeToggle() {
+    const btn = document.getElementById("themeToggle");
+    btn?.addEventListener("click", () => {
+      const cur = html.getAttribute("data-theme") || "light";
+      setTheme(cur === "light" ? "dark" : "light", true);
+    });
+  }
+
+  function wireLangToggle() {
+    document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lang = btn.getAttribute("data-lang-btn");
+        if (!lang) return;
+        setLang(lang, true);
+        wireForm(lang);
       });
-    }
-  }
-
-  function setYear() {
-    const y = $("#year");
-    if (y) y.textContent = new Date().getFullYear();
-  }
-
-  // Fix: after FAQ opens, keep height correct on resize
-  function resizeFAQHeights() {
-    $$(".faq-item.open").forEach(item => {
-      const a = $(".faq-a", item);
-      const inner = $(".faq-a-inner", item);
-      if (!a || !inner) return;
-      a.style.height = inner.scrollHeight + "px";
     });
   }
 
-  function boot() {
-    setBindTexts();
-    setContacts();
-    renderPopular();
-    renderServices();
-    renderPricing();
-    renderFAQ();
-    setBadges();
-    initServiceSelectors();
-    initForm();
-    setYear();
+  // ---- init ----
+  const theme = getInitialTheme();
+  setTheme(theme, false);
 
-    // add glass layers after DOM built
-    addGlassLayers();
+  const lang = getInitialLang();
+  setLang(lang, false);
 
-    window.addEventListener("resize", () => resizeFAQHeights());
-  }
+  wireLinks();
+  wireSmoothScroll();
+  wireThemeToggle();
+  wireLangToggle();
+  wireForm(lang);
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
 })();
