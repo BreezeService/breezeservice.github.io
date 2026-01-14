@@ -1,370 +1,329 @@
+// site.js (v3) — smooth iOS glass, mobile-safe layout, wind+rgb glow, accordion animation, theme+lang
 (() => {
-  const CFG = window.SITE_CONFIG;
-  if (!CFG) {
-    console.error("SITE_CONFIG not found (config.js).");
-    return;
+  const C = window.SITE_CONFIG;
+
+  // ---------- Helpers ----------
+  const $ = (s, p=document) => p.querySelector(s);
+  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+  // ---------- State ----------
+  const state = {
+    lang: localStorage.getItem("bs_lang") || "ru",
+    theme: localStorage.getItem("bs_theme") || "light",
+    activeServiceKey: C.services[0]?.key || "install",
+  };
+
+  // ---------- Apply theme ----------
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", state.theme);
+    const themeIco = $("#themeIco");
+    if (themeIco) themeIco.innerHTML = icon(state.theme === "dark" ? "moon" : "sun");
+    // theme-color for mobile top bar
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", state.theme === "dark" ? "#071018" : "#eaf7ff");
   }
 
-  const LS_THEME = "bs_theme";
-  const LS_LANG = "bs_lang";
-
-  const html = document.documentElement;
-
-  // ---- THEME ----
-  function getInitialTheme() {
-    const saved = localStorage.getItem(LS_THEME);
-    if (saved === "light" || saved === "dark") return saved;
-    // system fallback
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return prefersDark ? "dark" : "light";
+  // ---------- I18N ----------
+  function t(key) {
+    const dict = C.i18n[state.lang] || C.i18n.ru;
+    return dict[key] ?? (C.i18n.ru[key] ?? key);
   }
 
-  function setTheme(theme, persist = true) {
-    html.setAttribute("data-theme", theme);
-    html.querySelector('meta[name="theme-color"]')?.setAttribute(
-      "content",
-      theme === "dark" ? "#05070d" : "#F5F9FC"
-    );
-    if (persist) localStorage.setItem(LS_THEME, theme);
-  }
-
-  // ---- LANGUAGE ----
-  function getInitialLang() {
-    const saved = localStorage.getItem(LS_LANG);
-    if (saved && ["ru","en","uz"].includes(saved)) return saved;
-    return "ru";
-  }
-
-  function setLang(lang, persist = true) {
-    html.setAttribute("data-lang", lang);
-    html.lang = lang;
-    if (persist) localStorage.setItem(LS_LANG, lang);
-    applyI18n(lang);
-    renderDynamic(lang);
-    updateActiveLangButtons(lang);
-  }
-
-  function t(lang, key) {
-    const dict = CFG.i18n[lang] || CFG.i18n.ru;
-    return key.split(".").reduce((acc, k) => (acc && acc[k] != null ? acc[k] : null), dict);
-  }
-
-  function applyI18n(lang) {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      const val = t(lang, key);
-      if (val == null) return;
-      el.textContent = String(val);
+  function applyI18n() {
+    $$("[data-i18n]").forEach(el => {
+      const k = el.getAttribute("data-i18n");
+      el.textContent = t(k);
     });
 
-    // placeholders
-    const name = document.getElementById("name");
-    const msg = document.getElementById("msg");
-    if (name) name.placeholder = t(lang, "form.name") || "";
-    if (msg) msg.placeholder = t(lang, "form.comment") || "";
+    // Update FAQ text inside accordion (created from config)
+    renderFAQ();
+
+    // Update services chips + select
+    renderChips();
+    renderServiceSelect();
+
+    // Set active lang UI
+    const btns = $$(".seg__btn");
+    btns.forEach(b => b.classList.toggle("is-active", b.dataset.lang === state.lang));
+    moveLangPill();
   }
 
-  function updateActiveLangButtons(lang) {
-    document.querySelectorAll("[data-lang-btn]").forEach(btn => {
-      btn.classList.toggle("is-active", btn.getAttribute("data-lang-btn") === lang);
+  function moveLangPill() {
+    const wrap = $(".seg");
+    if (!wrap) return;
+    const pill = $(".seg__pill", wrap);
+    const btns = $$(".seg__btn", wrap);
+    const idx = btns.findIndex(b => b.dataset.lang === state.lang);
+    const i = idx >= 0 ? idx : 0;
+    pill.style.transform = `translateX(${i * 100}%)`;
+  }
+
+  // ---------- Links ----------
+  function applyLinks() {
+    const setHref = (id, href) => { const el = $(id); if (el) el.href = href; };
+
+    setHref("#tgBtn", C.telegramLink);
+    setHref("#tgBtn2", C.telegramLink);
+    setHref("#dockTG", C.telegramLink);
+
+    setHref("#waBtn", C.whatsappLink);
+    setHref("#waBtn2", C.whatsappLink);
+
+    setHref("#igBtn", C.instagramLink);
+    setHref("#igBtn2", C.instagramLink);
+
+    // ensure call buttons always correct
+    const callTop = $("#callTop");
+    if (callTop) callTop.href = `tel:${C.phoneRaw}`;
+  }
+
+  // ---------- Icons (minimal SVG, no emoji) ----------
+  function icon(name) {
+    const common = `fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
+    switch (name) {
+      case "phone":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.5 2.1L9.9 11a16 16 0 0 0 3.1 3.1l1.2-1.2a2 2 0 0 1 2.1-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg>`;
+      case "spark":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M12 2l1.4 6.1L19 9.5l-5.6 1.4L12 17l-1.4-6.1L5 9.5l5.6-1.4L12 2z"/><path d="M19 14l.8 3.3L23 18l-3.2.7L19 22l-.8-3.3L15 18l3.2-.7L19 14z"/></svg>`;
+      case "tg":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M21.8 4.6L3.6 11.7c-.9.3-.9 1.6.1 1.9l4.8 1.6 2 6.1c.3.9 1.5 1 2 .2l2.7-3.6 4.9 3.6c.7.5 1.7.1 1.9-.7l2.9-16.5c.2-.9-.7-1.6-1.5-1.3z"/><path d="M9 14.8l10.4-7.6"/></svg>`;
+      case "wa":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3 21l1.9-4.8A8.5 8.5 0 1 1 20.5 11.8z"/><path d="M8.7 8.6c-.4.5-.6 1.1-.5 1.7.2 1.1 1.1 2.6 2.4 3.8 1.3 1.2 2.9 2.1 4.1 2.2.6.1 1.2-.1 1.7-.5l.8-.7c.3-.3.4-.7.2-1l-.9-1.6c-.2-.4-.7-.5-1.1-.3l-1 .5c-.7-.3-1.5-.8-2.1-1.4-.6-.6-1.1-1.3-1.4-2.1l.5-1c.2-.4.1-.9-.3-1.1L9.7 7c-.3-.2-.7-.1-1 .2l-.8.8z"/></svg>`;
+      case "ig":
+        return `<svg viewBox="0 0 24 24" ${common}><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M16.5 11.8a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17.6 6.6h.01"/></svg>`;
+      case "chev":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M6 9l6 6 6-6"/></svg>`;
+      case "sun":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 4.9l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.9 19.1l1.4-1.4"/><path d="M17.7 6.3l1.4-1.4"/></svg>`;
+      case "moon":
+        return `<svg viewBox="0 0 24 24" ${common}><path d="M21 13.2A7.5 7.5 0 0 1 10.8 3 6.5 6.5 0 1 0 21 13.2z"/></svg>`;
+      default:
+        return "";
+    }
+  }
+
+  function injectIcons() {
+    $$("[data-ico]").forEach(el => {
+      const name = el.getAttribute("data-ico");
+      el.innerHTML = icon(name);
     });
   }
 
-  // ---- LINKS (correct) ----
-  function wireLinks() {
-    const telHref = `tel:${CFG.phone}`;
-    const callBtns = ["callBtnTop", "callBtnHero", "dockCall"].map(id => document.getElementById(id)).filter(Boolean);
-    callBtns.forEach(a => a.setAttribute("href", telHref));
-
-    const phoneLink = document.getElementById("phoneLink");
-    if (phoneLink) {
-      phoneLink.textContent = CFG.phonePretty;
-      phoneLink.href = telHref;
-    }
-
-    // socials
-    const tg = [document.getElementById("tgBtn"), document.getElementById("tgBtn2"), document.getElementById("dockTG"), document.getElementById("footTG")].filter(Boolean);
-    tg.forEach(a => a.href = CFG.telegramUrl);
-
-    const wa = [document.getElementById("waBtn"), document.getElementById("waBtn2")].filter(Boolean);
-    wa.forEach(a => a.href = CFG.whatsappUrl);
-
-    const ig = [document.getElementById("igBtn"), document.getElementById("igBtn2"), document.getElementById("footIG")].filter(Boolean);
-    ig.forEach(a => a.href = CFG.instagramUrl);
-
-    // footer copyright once
-    const c = document.getElementById("copyright");
-    if (c) c.textContent = `© ${new Date().getFullYear()} BreezeService`;
+  // ---------- Chips / Select ----------
+  function renderChips() {
+    const wrap = $("#chips");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    C.services.forEach(s => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip" + (s.key === state.activeServiceKey ? " is-active" : "");
+      b.textContent = s[state.lang] || s.ru;
+      b.addEventListener("click", () => {
+        state.activeServiceKey = s.key;
+        renderChips();
+        const sel = $("#service");
+        if (sel) sel.value = s.key;
+      }, { passive: true });
+      wrap.appendChild(b);
+    });
   }
 
-  // ---- DYNAMIC RENDER ----
-  function renderDynamic(lang) {
-    // hero pills
-    const pillsWrap = document.getElementById("heroPills");
-    if (pillsWrap) {
-      pillsWrap.innerHTML = "";
-      const arr = (t(lang, "hero.pills") || []);
-      arr.forEach(text => {
-        const el = document.createElement("span");
-        el.className = "pill";
-        el.textContent = text;
-        pillsWrap.appendChild(el);
-      });
-    }
-
-    // popular
-    const popular = document.getElementById("popularCards");
-    if (popular) {
-      popular.innerHTML = "";
-      const items = t(lang, "popular") || [];
-      items.forEach(it => {
-        const card = document.createElement("div");
-        card.className = "s-card glass rgb-hover";
-        card.innerHTML = `<h4>${escapeHtml(it.title)}</h4><p>${escapeHtml(it.text)}</p>`;
-        popular.appendChild(card);
-      });
-    }
-
-    // side badges
-    const side = document.getElementById("sideBadges");
-    if (side) {
-      side.innerHTML = "";
-      const list = (t(lang, "contact.badges") || []);
-      list.slice(0, 3).forEach(x => {
-        const b = document.createElement("span");
-        b.className = "badge";
-        b.textContent = x;
-        side.appendChild(b);
-      });
-    }
-
-    // services lists
-    const lists = document.getElementById("servicesLists");
-    if (lists) {
-      lists.innerHTML = "";
-      const blocks = t(lang, "services.lists") || [];
-      blocks.forEach(block => {
-        const wrap = document.createElement("div");
-        wrap.className = "card glass list rgb-hover";
-        const ul = document.createElement("ul");
-        block.items.forEach(it => {
-          const li = document.createElement("li");
-          li.className = "li";
-          li.innerHTML = `<span class="check"></span><div><b>${escapeHtml(it.b)}</b><span>${escapeHtml(it.s)}</span></div>`;
-          ul.appendChild(li);
-        });
-
-        wrap.innerHTML = `<h3>${escapeHtml(block.title)}</h3>`;
-        wrap.appendChild(ul);
-        lists.appendChild(wrap);
-      });
-    }
-
-    // pricing
-    const pricing = document.getElementById("pricingCards");
-    if (pricing) {
-      pricing.innerHTML = "";
-      const cards = t(lang, "pricing.cards") || [];
-      cards.forEach(p => {
-        const el = document.createElement("div");
-        el.className = "card glass plan rgb-hover";
-        el.innerHTML = `
-          <div class="tag">${escapeHtml(p.tag)}</div>
-          <h4>${escapeHtml(p.title)}</h4>
-          <p class="p">${escapeHtml(p.text)}</p>
-          <div class="cost">${escapeHtml(p.cost)}</div>
-          <ul>${(p.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
-        `;
-        pricing.appendChild(el);
-      });
-    }
-
-    // FAQ smooth
-    const faq = document.getElementById("faqList");
-    if (faq) {
-      faq.innerHTML = "";
-      const items = t(lang, "faq.items") || [];
-      items.forEach((it, idx) => {
-        const card = document.createElement("div");
-        card.className = "faq-item glass rgb-hover";
-        card.setAttribute("data-faq", String(idx));
-        card.innerHTML = `
-          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">
-            <span>${escapeHtml(it.q)}</span>
-            <span class="chev">▾</span>
-          </div>
-          <div class="faq-a" aria-hidden="true">
-            <p>${escapeHtml(it.a)}</p>
-          </div>
-        `;
-        faq.appendChild(card);
-      });
-
-      // bind
-      faq.querySelectorAll(".faq-item .faq-q").forEach(q => {
-        q.addEventListener("click", () => toggleFaq(q.closest(".faq-item")));
-        q.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggleFaq(q.closest(".faq-item"));
-          }
-        });
-      });
-    }
-
-    // service select
-    const select = document.getElementById("service");
-    if (select) {
-      select.innerHTML = "";
-      const opts = (CFG.servicesOptions && CFG.servicesOptions[lang]) || CFG.servicesOptions.ru;
-      opts.forEach(v => {
-        const o = document.createElement("option");
-        o.value = v;
-        o.textContent = v;
-        select.appendChild(o);
-      });
-    }
-
-    // contact badges
-    const cb = document.getElementById("contactBadges");
-    if (cb) {
-      cb.innerHTML = "";
-      const list = (t(lang, "contact.badges") || []);
-      list.forEach(x => {
-        const b = document.createElement("span");
-        b.className = "badge";
-        b.textContent = x;
-        cb.appendChild(b);
-      });
-    }
+  function renderServiceSelect() {
+    const sel = $("#service");
+    if (!sel) return;
+    sel.innerHTML = "";
+    C.services.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.key;
+      opt.textContent = s[state.lang] || s.ru;
+      sel.appendChild(opt);
+    });
+    sel.value = state.activeServiceKey;
+    sel.addEventListener("change", () => {
+      state.activeServiceKey = sel.value;
+      renderChips();
+    }, { passive: true });
   }
 
-  function toggleFaq(item) {
-    if (!item) return;
+  // ---------- Accordion (smooth height animation) ----------
+  function renderFAQ() {
+    const acc = $("#accordion");
+    if (!acc) return;
+    acc.innerHTML = "";
+
+    C.faq.forEach((item, idx) => {
+      const it = document.createElement("div");
+      it.className = "accItem";
+      it.dataset.idx = String(idx);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "accBtn";
+      btn.innerHTML = `<span>${item.q[state.lang] || item.q.ru}</span><span class="chev">${icon("chev")}</span>`;
+
+      const panel = document.createElement("div");
+      panel.className = "accPanel";
+
+      const inner = document.createElement("div");
+      inner.className = "accPanel__inner";
+      inner.textContent = item.a[state.lang] || item.a.ru;
+
+      panel.appendChild(inner);
+      it.appendChild(btn);
+      it.appendChild(panel);
+      acc.appendChild(it);
+
+      btn.addEventListener("click", () => toggleAcc(it), { passive: true });
+    });
+  }
+
+  function closeAcc(item) {
+    item.classList.remove("is-open");
+    const panel = $(".accPanel", item);
+    panel.style.height = "0px";
+  }
+
+  function openAcc(item) {
+    item.classList.add("is-open");
+    const panel = $(".accPanel", item);
+    const inner = $(".accPanel__inner", item);
+    panel.style.height = inner.scrollHeight + "px";
+  }
+
+  function toggleAcc(item) {
     const isOpen = item.classList.contains("is-open");
 
-    // close others
-    document.querySelectorAll(".faq-item.is-open").forEach(x => {
-      if (x !== item) {
-        x.classList.remove("is-open");
-        const q = x.querySelector(".faq-q");
-        if (q) q.setAttribute("aria-expanded", "false");
-        const a = x.querySelector(".faq-a");
-        if (a) a.setAttribute("aria-hidden", "true");
-      }
+    // optional: close others
+    $$(".accItem.is-open").forEach(x => {
+      if (x !== item) closeAcc(x);
     });
 
-    item.classList.toggle("is-open", !isOpen);
-    const q = item.querySelector(".faq-q");
-    const a = item.querySelector(".faq-a");
-    if (q) q.setAttribute("aria-expanded", String(!isOpen));
-    if (a) a.setAttribute("aria-hidden", String(isOpen));
+    if (isOpen) closeAcc(item);
+    else openAcc(item);
+
+    // ensure smooth if content changes (mobile)
+    requestAnimationFrame(() => {
+      if (item.classList.contains("is-open")) {
+        const panel = $(".accPanel", item);
+        const inner = $(".accPanel__inner", item);
+        panel.style.height = inner.scrollHeight + "px";
+      }
+    });
   }
 
-  // ---- FORM -> open messenger with ready text ----
-  function wireForm(lang) {
-    const form = document.getElementById("leadForm");
-    const tgBtn = document.getElementById("sendTelegram");
+  // Recompute open accordion heights on resize (orientation change)
+  function bindResizeAccordionFix() {
+    let raf = 0;
+    window.addEventListener("resize", () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        $$(".accItem.is-open").forEach(item => {
+          const panel = $(".accPanel", item);
+          const inner = $(".accPanel__inner", item);
+          panel.style.height = inner.scrollHeight + "px";
+        });
+      });
+    }, { passive: true });
+  }
+
+  // ---------- Form -> WhatsApp / Telegram prefilled ----------
+  function buildMessage() {
+    const name = ($("#name")?.value || "").trim();
+    const phone = ($("#phone")?.value || "").trim();
+    const serviceKey = $("#service")?.value || state.activeServiceKey;
+    const serviceObj = C.services.find(s => s.key === serviceKey) || C.services[0];
+    const serviceTxt = serviceObj ? (serviceObj[state.lang] || serviceObj.ru) : "";
+
+    const msg = ($("#msg")?.value || "").trim();
+
+    const lines = [];
+    if (name) lines.push(`${t("name")}: ${name}`);
+    if (phone) lines.push(`${t("phone")}: ${phone}`);
+    if (serviceTxt) lines.push(`${t("service")}: ${serviceTxt}`);
+    if (msg) lines.push(`${t("comment")}: ${msg}`);
+
+    if (!lines.length) lines.push("Здравствуйте! Нужна консультация по кондиционеру.");
+    return lines.join("\n");
+  }
+
+  function bindForm() {
+    const form = $("#reqForm");
     if (!form) return;
 
-    const buildMessage = () => {
-      const name = (document.getElementById("name")?.value || "").trim();
-      const phone = (document.getElementById("phone")?.value || "").trim();
-      const service = (document.getElementById("service")?.value || "").trim();
-      const msg = (document.getElementById("msg")?.value || "").trim();
-
-      // short + clean
-      const lines = [];
-      lines.push(`BreezeService — ${t(lang, "contact.title")}`);
-      if (name) lines.push(`${t(lang, "form.name")}: ${name}`);
-      if (phone) lines.push(`${t(lang, "form.phone")}: ${phone}`);
-      if (service) lines.push(`${t(lang, "form.service")}: ${service}`);
-      if (msg) lines.push(`${t(lang, "form.comment")}: ${msg}`);
-      return lines.join("\n");
-    };
+    const wa = $("#sendWA");
+    const tg = $("#sendTG");
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const text = encodeURIComponent(buildMessage());
-      // WhatsApp
-      const wa = CFG.whatsappUrl || `https://wa.me/${CFG.phone.replace(/\D/g, "")}`;
-      window.open(`${wa}?text=${text}`, "_blank", "noopener");
+      // WhatsApp deep link
+      const url = `${C.whatsappLink}?text=${text}`;
+      window.open(url, "_blank", "noopener");
     });
 
-    tgBtn?.addEventListener("click", () => {
+    tg?.addEventListener("click", () => {
       const text = encodeURIComponent(buildMessage());
-      const tg = CFG.telegramUrl || "https://t.me/";
-      // If tg is channel link - open it, message user manually.
-      // We'll open Telegram link + put message into clipboard for convenience.
-      copyToClipboard(decodeURIComponent(text));
-      window.open(tg, "_blank", "noopener");
-      // tiny feedback
-      tgBtn.textContent = "✓ Copied";
-      setTimeout(() => tgBtn.textContent = t(getLang(), "form.sendTelegram"), 900);
+      // Telegram share
+      const url = `https://t.me/share/url?url=&text=${text}`;
+      window.open(url, "_blank", "noopener");
+    }, { passive: true });
+  }
+
+  // ---------- Theme toggle ----------
+  function bindTheme() {
+    const btn = $("#themeBtn");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("bs_theme", state.theme);
+      applyTheme();
+    }, { passive: true });
+  }
+
+  // ---------- Language toggle ----------
+  function bindLang() {
+    $$(".seg__btn").forEach(b => {
+      b.addEventListener("click", () => {
+        state.lang = b.dataset.lang || "ru";
+        localStorage.setItem("bs_lang", state.lang);
+        applyI18n();
+      }, { passive: true });
     });
   }
 
-  function getLang(){ return html.getAttribute("data-lang") || "ru"; }
+  // ---------- Fix “half panel visible” on mobile (usually horizontal overflow) ----------
+  function hardenMobileLayout() {
+    // Kill any accidental horizontal scroll
+    document.documentElement.style.overflowX = "hidden";
+    document.body.style.overflowX = "hidden";
 
-  async function copyToClipboard(text){
-    try { await navigator.clipboard.writeText(text); } catch {}
+    // Also prevent momentum weirdness inside IG in-app browser
+    document.body.style.webkitOverflowScrolling = "touch";
   }
 
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  // ---------- Init ----------
+  function init() {
+    $("#y").textContent = String(new Date().getFullYear());
+
+    hardenMobileLayout();
+    applyTheme();
+    applyLinks();
+    injectIcons();
+    bindTheme();
+    bindLang();
+
+    applyI18n();
+    bindResizeAccordionFix();
+    bindForm();
+
+    // Keep lang pill correct after fonts load
+    setTimeout(moveLangPill, 60);
+
+    // Smooth highlight fix for tap on iOS: no focus outline “blue squares”
+    document.addEventListener("touchstart", () => {}, { passive: true });
   }
 
-  // ---- Smooth scroll (fix “half letters cut” / jumpy) ----
-  function wireSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener("click", (e) => {
-        const href = a.getAttribute("href");
-        if (!href || href === "#") return;
-        const el = document.querySelector(href);
-        if (!el) return;
-        e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        history.replaceState(null, "", href);
-      }, { passive: false });
-    });
-  }
-
-  // ---- UI binds ----
-  function wireThemeToggle() {
-    const btn = document.getElementById("themeToggle");
-    btn?.addEventListener("click", () => {
-      const cur = html.getAttribute("data-theme") || "light";
-      setTheme(cur === "light" ? "dark" : "light", true);
-    });
-  }
-
-  function wireLangToggle() {
-    document.querySelectorAll("[data-lang-btn]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const lang = btn.getAttribute("data-lang-btn");
-        if (!lang) return;
-        setLang(lang, true);
-        wireForm(lang);
-      });
-    });
-  }
-
-  // ---- init ----
-  const theme = getInitialTheme();
-  setTheme(theme, false);
-
-  const lang = getInitialLang();
-  setLang(lang, false);
-
-  wireLinks();
-  wireSmoothScroll();
-  wireThemeToggle();
-  wireLangToggle();
-  wireForm(lang);
-
+  document.addEventListener("DOMContentLoaded", init);
 })();
