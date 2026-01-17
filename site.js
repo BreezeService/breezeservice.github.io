@@ -1,328 +1,376 @@
-// site.js (v3) — smooth iOS glass, mobile-safe layout, wind+rgb glow, accordion animation, theme+lang
 (() => {
-  const C = window.SITE_CONFIG;
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-  // ---------- Helpers ----------
-  const $ = (s, p=document) => p.querySelector(s);
-  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-
-  // ---------- State ----------
-  const state = {
-    lang: localStorage.getItem("bs_lang") || "ru",
-    theme: localStorage.getItem("bs_theme") || "light",
-    activeServiceKey: C.services[0]?.key || "install",
+  // ========= i18n =========
+  const dict = {
+    ru: {
+      brandSub: "Сервис кондиционеров • Ташкент",
+      theme: "Тема",
+      call: "Позвонить",
+      request: "Заявка",
+      leaveRequest: "Заявка",
+      kicker: "ТАШКЕНТ • КЛИМАТ-СЕРВИС",
+      heroTitle: "BreezeService — сервис кондиционеров в Ташкенте",
+      heroLead: "Помогаем частным клиентам и объектам любого масштаба: от чистки до установки и ремонта. Один звонок — консультация — выезд мастера без лишних сложностей.",
+      sInstall: "Установка",
+      sClean: "Чистка",
+      sRepair: "Ремонт",
+      sFreon: "Заправка фреоном",
+      sDiag: "Диагностика",
+      bullet1: "Гарантия на установку — 1 год",
+      bullet2: "Оплата по факту выполненной работы",
+      pricingH: "Стоимость",
+      pricingLead: "Стоимость не фиксирована — зависит от задач",
+      pTag1: "Чистка", p1a:"Чистка блоков", p1b:"Проверка работы", p1c:"Рекомендации",
+      pTag2: "Установка", p2a:"Подбор решения", p2b:"Проверка запуска", p2c:"Гарантия 1 год",
+      pTag3: "Ремонт/Диагностика", p3a:"Диагностика", p3b:"Согласование цены", p3c:"Ремонт по факту",
+      noteTag: "Важно",
+      noteText: "Перед выездом вы всегда получаете предварительную консультацию по телефону.",
+      faqLead: "Гарантии и частые вопросы.",
+      faqQ1:"Какая гарантия?", faqA1:"Гарантия на установку — 1 год. На остальные работы — по договорённости с мастером.",
+      faqQ2:"Как формируется цена?", faqA2:"Зависит от сложности, количества кондиционеров, условий монтажа и состояния оборудования.",
+      faqQ3:"Работаете с крупными объектами?", faqA3:"Да: офисы, магазины, коммерческие помещения и дома с несколькими кондиционерами. Делаем оценку и смету.",
+      reqH:"Заявка",
+      reqLead:"Заполни форму — откроем мессенджер с готовым текстом.",
+      name:"Имя",
+      phone:"Телефон",
+      service:"Услуга",
+      comment:"Комментарий",
+      sendWA:"Отправить в WhatsApp",
+      sendTG:"Отправить в Telegram",
+      afterSubmit:"Мы отвечаем максимально быстро и стараемся подобрать удобное время для выезда мастера."
+    },
+    en: {
+      brandSub: "AC service • Tashkent",
+      theme: "Theme",
+      call: "Call",
+      request: "Request",
+      leaveRequest: "Request",
+      kicker: "TASHKENT • CLIMATE SERVICE",
+      heroTitle: "BreezeService — AC service in Tashkent",
+      heroLead: "We help private clients and any-scale sites: from cleaning to installation and repair. One call — consultation — technician visit with no hassle.",
+      sInstall: "Installation",
+      sClean: "Cleaning",
+      sRepair: "Repair",
+      sFreon: "Freon refill",
+      sDiag: "Diagnostics",
+      bullet1: "Installation warranty — 1 year",
+      bullet2: "Pay after the job is done",
+      pricingH: "Pricing",
+      pricingLead: "No fixed price — depends on the task",
+      pTag1:"Cleaning", p1a:"Unit cleaning", p1b:"Performance check", p1c:"Recommendations",
+      pTag2:"Installation", p2a:"Solution selection", p2b:"Startup check", p2c:"1-year warranty",
+      pTag3:"Repair/Diagnostics", p3a:"Diagnostics", p3b:"Price approval", p3c:"Repair after approval",
+      noteTag:"Important",
+      noteText:"Before the visit you always get a предварительная phone consultation.",
+      faqLead:"Warranty and common questions.",
+      faqQ1:"What warranty?", faqA1:"Installation warranty is 1 year. Other jobs — as agreed with the technician.",
+      faqQ2:"How is the price formed?", faqA2:"Depends on complexity, number of units, installation conditions and equipment state.",
+      faqQ3:"Do you work with large sites?", faqA3:"Yes: offices, shops, commercial spaces and homes with multiple units. We estimate and provide a quote.",
+      reqH:"Request",
+      reqLead:"Fill the form — we open a messenger with a ready text.",
+      name:"Name",
+      phone:"Phone",
+      service:"Service",
+      comment:"Comment",
+      sendWA:"Send to WhatsApp",
+      sendTG:"Send to Telegram",
+      afterSubmit:"We reply fast and help pick a convenient visit time."
+    },
+    uz: {
+      brandSub: "Konditsioner servisi • Toshkent",
+      theme: "Mavzu",
+      call: "Qo‘ng‘iroq",
+      request: "Ariza",
+      leaveRequest: "Ariza",
+      kicker: "TOSHKENT • KLIMAT-SERVIS",
+      heroTitle: "BreezeService — Toshkentda konditsioner servisi",
+      heroLead: "Xususiy mijozlar va har qanday obyektlar uchun: tozalashdan o‘rnatish va ta’mirlashgacha. Bitta qo‘ng‘iroq — maslahat — usta chiqishi.",
+      sInstall: "O‘rnatish",
+      sClean: "Tozalash",
+      sRepair: "Ta’mirlash",
+      sFreon: "Freon quyish",
+      sDiag: "Diagnostika",
+      bullet1: "O‘rnatishga kafolat — 1 yil",
+      bullet2: "Ish tugagach to‘lov",
+      pricingH: "Narx",
+      pricingLead: "Narx qat’iy emas — vazifaga bog‘liq",
+      pTag1:"Tozalash", p1a:"Bloklarni tozalash", p1b:"Ishini tekshirish", p1c:"Tavsiyalar",
+      pTag2:"O‘rnatish", p2a:"Yechim tanlash", p2b:"Ishga tushirish", p2c:"1 yil kafolat",
+      pTag3:"Ta’mir/Diagnostika", p3a:"Diagnostika", p3b:"Narx kelishuvi", p3c:"Kelishilgan ta’mir",
+      noteTag:"Muhim",
+      noteText:"Usta kelishidan oldin telefon orqali dastlabki maslahat olasiz.",
+      faqLead:"Kafolat va tez-tez savollar.",
+      faqQ1:"Qanday kafolat?", faqA1:"O‘rnatishga 1 yil kafolat. Boshqa ishlar — usta bilan kelishiladi.",
+      faqQ2:"Narx qanday belgilanadi?", faqA2:"Murakkablik, konditsionerlar soni, o‘rnatish sharoiti va holatiga bog‘liq.",
+      faqQ3:"Katta obyektlar bilan ishlaysizmi?", faqA3:"Ha: ofislar, do‘konlar, tijorat joylari va bir nechta konditsionerli uylar. Smeta qilamiz.",
+      reqH:"Ariza",
+      reqLead:"Formani to‘ldiring — tayyor matn bilan messenjer ochamiz.",
+      name:"Ism",
+      phone:"Telefon",
+      service:"Xizmat",
+      comment:"Izoh",
+      sendWA:"WhatsAppga yuborish",
+      sendTG:"Telegramga yuborish",
+      afterSubmit:"Tez javob beramiz va qulay vaqtni tanlaymiz."
+    }
   };
 
-  // ---------- Apply theme ----------
-  function applyTheme() {
-    document.documentElement.setAttribute("data-theme", state.theme);
-    const themeIco = $("#themeIco");
-    if (themeIco) themeIco.innerHTML = icon(state.theme === "dark" ? "moon" : "sun");
-    // theme-color for mobile top bar
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", state.theme === "dark" ? "#071018" : "#eaf7ff");
-  }
-
-  // ---------- I18N ----------
-  function t(key) {
-    const dict = C.i18n[state.lang] || C.i18n.ru;
-    return dict[key] ?? (C.i18n.ru[key] ?? key);
-  }
-
-  function applyI18n() {
-    $$("[data-i18n]").forEach(el => {
+  function applyLang(lang){
+    const d = dict[lang] || dict.ru;
+    document.documentElement.setAttribute("data-lang", lang);
+    $$("[data-i18n]").forEach(el=>{
       const k = el.getAttribute("data-i18n");
-      el.textContent = t(k);
+      if (d[k]) el.textContent = d[k];
     });
-
-    // Update FAQ text inside accordion (created from config)
-    renderFAQ();
-
-    // Update services chips + select
-    renderChips();
-    renderServiceSelect();
-
-    // Set active lang UI
-    const btns = $$(".seg__btn");
-    btns.forEach(b => b.classList.toggle("is-active", b.dataset.lang === state.lang));
-    moveLangPill();
+    // update segmented pill position
+    setLangPill(lang);
   }
 
-  function moveLangPill() {
-    const wrap = $(".seg");
-    if (!wrap) return;
-    const pill = $(".seg__pill", wrap);
-    const btns = $$(".seg__btn", wrap);
-    const idx = btns.findIndex(b => b.dataset.lang === state.lang);
-    const i = idx >= 0 ? idx : 0;
-    pill.style.transform = `translateX(${i * 100}%)`;
+  function setLangPill(lang){
+    const pill = $(".seg-pill");
+    const buttons = $$("[data-lang-btn]");
+    const idx = Math.max(0, buttons.findIndex(b => b.dataset.langBtn === lang));
+    pill.style.transform = `translateX(${idx * (buttons[0].offsetWidth + 6)}px)`;
+    buttons.forEach(b => b.classList.toggle("active", b.dataset.langBtn === lang));
   }
 
-  // ---------- Links ----------
-  function applyLinks() {
-    const setHref = (id, href) => { const el = $(id); if (el) el.href = href; };
-
-    setHref("#tgBtn", C.telegramLink);
-    setHref("#tgBtn2", C.telegramLink);
-    setHref("#dockTG", C.telegramLink);
-
-    setHref("#waBtn", C.whatsappLink);
-    setHref("#waBtn2", C.whatsappLink);
-
-    setHref("#igBtn", C.instagramLink);
-    setHref("#igBtn2", C.instagramLink);
-
-    // ensure call buttons always correct
-    const callTop = $("#callTop");
-    if (callTop) callTop.href = `tel:${C.phoneRaw}`;
+  // ========= Theme =========
+  function setTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("bs_theme", theme);
   }
 
-  // ---------- Icons (minimal SVG, no emoji) ----------
-  function icon(name) {
-    const common = `fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
-    switch (name) {
-      case "phone":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.5 2.1L9.9 11a16 16 0 0 0 3.1 3.1l1.2-1.2a2 2 0 0 1 2.1-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2z"/></svg>`;
-      case "spark":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M12 2l1.4 6.1L19 9.5l-5.6 1.4L12 17l-1.4-6.1L5 9.5l5.6-1.4L12 2z"/><path d="M19 14l.8 3.3L23 18l-3.2.7L19 22l-.8-3.3L15 18l3.2-.7L19 14z"/></svg>`;
-      case "tg":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M21.8 4.6L3.6 11.7c-.9.3-.9 1.6.1 1.9l4.8 1.6 2 6.1c.3.9 1.5 1 2 .2l2.7-3.6 4.9 3.6c.7.5 1.7.1 1.9-.7l2.9-16.5c.2-.9-.7-1.6-1.5-1.3z"/><path d="M9 14.8l10.4-7.6"/></svg>`;
-      case "wa":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3 21l1.9-4.8A8.5 8.5 0 1 1 20.5 11.8z"/><path d="M8.7 8.6c-.4.5-.6 1.1-.5 1.7.2 1.1 1.1 2.6 2.4 3.8 1.3 1.2 2.9 2.1 4.1 2.2.6.1 1.2-.1 1.7-.5l.8-.7c.3-.3.4-.7.2-1l-.9-1.6c-.2-.4-.7-.5-1.1-.3l-1 .5c-.7-.3-1.5-.8-2.1-1.4-.6-.6-1.1-1.3-1.4-2.1l.5-1c.2-.4.1-.9-.3-1.1L9.7 7c-.3-.2-.7-.1-1 .2l-.8.8z"/></svg>`;
-      case "ig":
-        return `<svg viewBox="0 0 24 24" ${common}><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M16.5 11.8a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17.6 6.6h.01"/></svg>`;
-      case "chev":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M6 9l6 6 6-6"/></svg>`;
-      case "sun":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 4.9l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.9 19.1l1.4-1.4"/><path d="M17.7 6.3l1.4-1.4"/></svg>`;
-      case "moon":
-        return `<svg viewBox="0 0 24 24" ${common}><path d="M21 13.2A7.5 7.5 0 0 1 10.8 3 6.5 6.5 0 1 0 21 13.2z"/></svg>`;
-      default:
-        return "";
-    }
-  }
-
-  function injectIcons() {
-    $$("[data-ico]").forEach(el => {
-      const name = el.getAttribute("data-ico");
-      el.innerHTML = icon(name);
+  // ========= FAQ smooth toggle =========
+  function initFAQ(){
+    $$(".faq-item .faq-q").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const item = btn.closest(".faq-item");
+        const open = item.classList.toggle("open");
+        // close others for nicer UX
+        if(open){
+          $$(".faq-item.open").forEach(other=>{
+            if(other !== item) other.classList.remove("open");
+          });
+        }
+      }, {passive:true});
     });
   }
 
-  // ---------- Chips / Select ----------
-  function renderChips() {
-    const wrap = $("#chips");
-    if (!wrap) return;
-    wrap.innerHTML = "";
-    C.services.forEach(s => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "chip" + (s.key === state.activeServiceKey ? " is-active" : "");
-      b.textContent = s[state.lang] || s.ru;
-      b.addEventListener("click", () => {
-        state.activeServiceKey = s.key;
-        renderChips();
-        const sel = $("#service");
-        if (sel) sel.value = s.key;
-      }, { passive: true });
-      wrap.appendChild(b);
-    });
-  }
-
-  function renderServiceSelect() {
-    const sel = $("#service");
-    if (!sel) return;
-    sel.innerHTML = "";
-    C.services.forEach(s => {
-      const opt = document.createElement("option");
-      opt.value = s.key;
-      opt.textContent = s[state.lang] || s.ru;
-      sel.appendChild(opt);
-    });
-    sel.value = state.activeServiceKey;
-    sel.addEventListener("change", () => {
-      state.activeServiceKey = sel.value;
-      renderChips();
-    }, { passive: true });
-  }
-
-  // ---------- Accordion (smooth height animation) ----------
-  function renderFAQ() {
-    const acc = $("#accordion");
-    if (!acc) return;
-    acc.innerHTML = "";
-
-    C.faq.forEach((item, idx) => {
-      const it = document.createElement("div");
-      it.className = "accItem";
-      it.dataset.idx = String(idx);
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "accBtn";
-      btn.innerHTML = `<span>${item.q[state.lang] || item.q.ru}</span><span class="chev">${icon("chev")}</span>`;
-
-      const panel = document.createElement("div");
-      panel.className = "accPanel";
-
-      const inner = document.createElement("div");
-      inner.className = "accPanel__inner";
-      inner.textContent = item.a[state.lang] || item.a.ru;
-
-      panel.appendChild(inner);
-      it.appendChild(btn);
-      it.appendChild(panel);
-      acc.appendChild(it);
-
-      btn.addEventListener("click", () => toggleAcc(it), { passive: true });
-    });
-  }
-
-  function closeAcc(item) {
-    item.classList.remove("is-open");
-    const panel = $(".accPanel", item);
-    panel.style.height = "0px";
-  }
-
-  function openAcc(item) {
-    item.classList.add("is-open");
-    const panel = $(".accPanel", item);
-    const inner = $(".accPanel__inner", item);
-    panel.style.height = inner.scrollHeight + "px";
-  }
-
-  function toggleAcc(item) {
-    const isOpen = item.classList.contains("is-open");
-
-    // optional: close others
-    $$(".accItem.is-open").forEach(x => {
-      if (x !== item) closeAcc(x);
-    });
-
-    if (isOpen) closeAcc(item);
-    else openAcc(item);
-
-    // ensure smooth if content changes (mobile)
-    requestAnimationFrame(() => {
-      if (item.classList.contains("is-open")) {
-        const panel = $(".accPanel", item);
-        const inner = $(".accPanel__inner", item);
-        panel.style.height = inner.scrollHeight + "px";
-      }
-    });
-  }
-
-  // Recompute open accordion heights on resize (orientation change)
-  function bindResizeAccordionFix() {
-    let raf = 0;
-    window.addEventListener("resize", () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        $$(".accItem.is-open").forEach(item => {
-          const panel = $(".accPanel", item);
-          const inner = $(".accPanel__inner", item);
-          panel.style.height = inner.scrollHeight + "px";
-        });
+  // ========= Service chips =========
+  function initChips(){
+    const hidden = $("#serviceHidden");
+    $$("#serviceChips .seg-chip").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        $$("#serviceChips .seg-chip").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        hidden.value = btn.dataset.val || "install";
       });
-    }, { passive: true });
-  }
-
-  // ---------- Form -> WhatsApp / Telegram prefilled ----------
-  function buildMessage() {
-    const name = ($("#name")?.value || "").trim();
-    const phone = ($("#phone")?.value || "").trim();
-    const serviceKey = $("#service")?.value || state.activeServiceKey;
-    const serviceObj = C.services.find(s => s.key === serviceKey) || C.services[0];
-    const serviceTxt = serviceObj ? (serviceObj[state.lang] || serviceObj.ru) : "";
-
-    const msg = ($("#msg")?.value || "").trim();
-
-    const lines = [];
-    if (name) lines.push(`${t("name")}: ${name}`);
-    if (phone) lines.push(`${t("phone")}: ${phone}`);
-    if (serviceTxt) lines.push(`${t("service")}: ${serviceTxt}`);
-    if (msg) lines.push(`${t("comment")}: ${msg}`);
-
-    if (!lines.length) lines.push("Здравствуйте! Нужна консультация по кондиционеру.");
-    return lines.join("\n");
-  }
-
-  function bindForm() {
-    const form = $("#reqForm");
-    if (!form) return;
-
-    const wa = $("#sendWA");
-    const tg = $("#sendTG");
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = encodeURIComponent(buildMessage());
-      // WhatsApp deep link
-      const url = `${C.whatsappLink}?text=${text}`;
-      window.open(url, "_blank", "noopener");
-    });
-
-    tg?.addEventListener("click", () => {
-      const text = encodeURIComponent(buildMessage());
-      // Telegram share
-      const url = `https://t.me/share/url?url=&text=${text}`;
-      window.open(url, "_blank", "noopener");
-    }, { passive: true });
-  }
-
-  // ---------- Theme toggle ----------
-  function bindTheme() {
-    const btn = $("#themeBtn");
-    if (!btn) return;
-    btn.addEventListener("click", () => {
-      state.theme = state.theme === "dark" ? "light" : "dark";
-      localStorage.setItem("bs_theme", state.theme);
-      applyTheme();
-    }, { passive: true });
-  }
-
-  // ---------- Language toggle ----------
-  function bindLang() {
-    $$(".seg__btn").forEach(b => {
-      b.addEventListener("click", () => {
-        state.lang = b.dataset.lang || "ru";
-        localStorage.setItem("bs_lang", state.lang);
-        applyI18n();
-      }, { passive: true });
     });
   }
 
-  // ---------- Fix “half panel visible” on mobile (usually horizontal overflow) ----------
-  function hardenMobileLayout() {
-    // Kill any accidental horizontal scroll
-    document.documentElement.style.overflowX = "hidden";
-    document.body.style.overflowX = "hidden";
+  // ========= Request -> open WA / TG with prepared text =========
+  function buildMsg(){
+    const lang = document.documentElement.getAttribute("data-lang") || "ru";
+    const d = dict[lang] || dict.ru;
 
-    // Also prevent momentum weirdness inside IG in-app browser
-    document.body.style.webkitOverflowScrolling = "touch";
+    const name = ($("#nameInput").value || "").trim();
+    const phone = ($("#phoneInput").value || "").trim();
+    const service = ($("#serviceHidden").value || "").trim();
+    const comment = ($("#commentInput").value || "").trim();
+
+    // map service keys to localized titles
+    const serviceTitle = ({
+      install: d.sInstall, clean: d.sClean, repair: d.sRepair, freon: d.sFreon, diag: d.sDiag
+    })[service] || d.sInstall;
+
+    let msg = `BreezeService — ${d.reqH}\n`;
+    if(name) msg += `${d.name}: ${name}\n`;
+    if(phone) msg += `${d.phone}: ${phone}\n`;
+    msg += `${d.service}: ${serviceTitle}\n`;
+    if(comment) msg += `${d.comment}: ${comment}\n`;
+    return msg;
   }
 
-  // ---------- Init ----------
-  function init() {
-    $("#y").textContent = String(new Date().getFullYear());
+  function initRequestButtons(){
+    const waBtn = $("#sendWA");
+    const tgBtn = $("#sendTG");
 
-    hardenMobileLayout();
-    applyTheme();
-    applyLinks();
-    injectIcons();
-    bindTheme();
-    bindLang();
+    waBtn.addEventListener("click", ()=>{
+      const msg = encodeURIComponent(buildMsg());
+      // wa.me works best in mobile/instagram browser
+      window.open(`https://wa.me/998910094469?text=${msg}`, "_blank", "noopener");
+    });
 
-    applyI18n();
-    bindResizeAccordionFix();
-    bindForm();
+    tgBtn.addEventListener("click", ()=>{
+      // direct chat link is your t.me; we also copy text into clipboard if possible
+      const msg = buildMsg();
+      try { navigator.clipboard.writeText(msg); } catch(e) {}
+      window.open(`https://t.me/breezeserv1se`, "_blank", "noopener");
+    });
+  }
 
-    // Keep lang pill correct after fonts load
-    setTimeout(moveLangPill, 60);
+  // ========= Smooth anchor scroll =========
+  function initSmoothScroll(){
+    $$('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click",(e)=>{
+        const id = a.getAttribute("href");
+        if(!id || id === "#") return;
+        const target = document.querySelector(id);
+        if(!target) return;
+        e.preventDefault();
+        target.scrollIntoView({behavior:"smooth", block:"start"});
+        history.replaceState(null,"",id);
+      });
+    });
+  }
 
-    // Smooth highlight fix for tap on iOS: no focus outline “blue squares”
-    document.addEventListener("touchstart", () => {}, { passive: true });
+  // ========= Air flow paths between tiles (snake left->right) =========
+  function buildFlow(){
+    const svg = $("#flowLayer");
+    if(!svg) return;
+
+    // nodes: hero panel -> tiles in DOM order -> pricing -> faq -> request (snake)
+    const nodes = $$("[data-flow-node]");
+    if(nodes.length < 2) return;
+
+    // SVG setup
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+    svg.innerHTML = "";
+
+    // helper to get center points in viewport coords
+    const pt = (el) => {
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left + r.width/2,
+        y: r.top + r.height/2
+      };
+    };
+
+    // Create chained paths: each panel gets one in/out (a single chain)
+    // snake: left->right wiggle in each segment
+    function snakePath(a, b, i){
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const mx = a.x + dx * 0.5;
+      const amp = Math.min(80, Math.max(28, Math.abs(dx)*0.15 + 22));
+      const sign = (i % 2 === 0) ? 1 : -1;
+      const c1x = a.x + dx * 0.25;
+      const c1y = a.y + dy * 0.10 + sign * amp;
+      const c2x = a.x + dx * 0.75;
+      const c2y = a.y + dy * 0.90 - sign * amp;
+      return `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`;
+    }
+
+    // build segments, but only connect visible-ish nodes to avoid crazy lines on small screens
+    const points = nodes.map(pt);
+    for(let i=0;i<points.length-1;i++){
+      const a = points[i], b = points[i+1];
+
+      // skip if both are far outside viewport (performance)
+      if((a.y < -200 && b.y < -200) || (a.y > vh+200 && b.y > vh+200)) continue;
+
+      const d = snakePath(a, b, i);
+
+      // glow (RGB edge, outside)
+      const glow = document.createElementNS("http://www.w3.org/2000/svg","path");
+      glow.setAttribute("d", d);
+      glow.setAttribute("class","flow-glow");
+      glow.setAttribute("stroke", "url(#flowRGB)");
+      svg.appendChild(glow);
+
+      // base path
+      const base = document.createElementNS("http://www.w3.org/2000/svg","path");
+      base.setAttribute("d", d);
+      base.setAttribute("class","flow-path");
+      base.setAttribute("stroke", "rgba(95,169,201,.32)");
+      svg.appendChild(base);
+
+      // moving dashes (air particles)
+      const dash = document.createElementNS("http://www.w3.org/2000/svg","path");
+      dash.setAttribute("d", d);
+      dash.setAttribute("class","flow-dash");
+      svg.appendChild(dash);
+    }
+
+    // defs for RGB gradient (outside glow)
+    const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+    defs.innerHTML = `
+      <linearGradient id="flowRGB" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"  stop-color="rgba(255,0,140,.55)"/>
+        <stop offset="30%" stop-color="rgba(0,180,255,.55)"/>
+        <stop offset="60%" stop-color="rgba(0,255,170,.45)"/>
+        <stop offset="85%" stop-color="rgba(255,200,0,.40)"/>
+        <stop offset="100%" stop-color="rgba(255,0,140,.55)"/>
+      </linearGradient>
+    `;
+    svg.prepend(defs);
+  }
+
+  // rebuild flow on resize/scroll (throttled)
+  function throttle(fn, wait=120){
+    let t=0, raf=0;
+    return (...args)=>{
+      const now = Date.now();
+      if(now - t >= wait){
+        t = now;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(()=>fn(...args));
+      }
+    };
+  }
+
+  // ========= Init =========
+  function init(){
+    // year
+    $("#year").textContent = String(new Date().getFullYear());
+
+    // default theme
+    const savedTheme = localStorage.getItem("bs_theme");
+    if(savedTheme){
+      setTheme(savedTheme);
+    } else {
+      // if system prefers dark
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+
+    // theme toggle
+    $("#themeToggle").addEventListener("click", ()=>{
+      const cur = document.documentElement.getAttribute("data-theme") || "light";
+      setTheme(cur === "light" ? "dark" : "light");
+    });
+
+    // language default
+    const savedLang = localStorage.getItem("bs_lang") || "ru";
+    applyLang(savedLang);
+
+    // language buttons
+    $$("[data-lang-btn]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const lang = btn.dataset.langBtn;
+        localStorage.setItem("bs_lang", lang);
+        applyLang(lang);
+      }, {passive:true});
+    });
+
+    initFAQ();
+    initChips();
+    initRequestButtons();
+    initSmoothScroll();
+
+    // initial flow + updates
+    const rebuild = throttle(buildFlow, 140);
+    buildFlow();
+    window.addEventListener("resize", rebuild, {passive:true});
+    window.addEventListener("scroll", rebuild, {passive:true});
+
+    // also rebuild after fonts/images settle
+    setTimeout(buildFlow, 350);
+    setTimeout(buildFlow, 900);
   }
 
   document.addEventListener("DOMContentLoaded", init);
