@@ -1,7 +1,47 @@
+// config.js
 window.SITE_CONFIG = {
-  phone: "+998910094469",
-  telegram: "https://t.me/breezeserv1se",
-  instagram: "https://instagram.com/breezeservise.uz",
-  whatsapp: "https://wa.me/998910094469",
-  brandName: "BreezeService"
+  brand: {
+    name: "BreezeService",
+    city: "Ташкент"
+  },
+
+  contacts: {
+    phone: "+998910094469",
+    phonePretty: "+998 91 009 44 69",
+    telegram: "https://t.me/breezeserv1se",
+    instagram: "https://instagram.com/breezeservise.uz",
+    whatsapp: "https://wa.me/998910094469"
+  },
+
+  services: [
+    "Установка кондиционеров",
+    "Демонтаж кондиционеров",
+    "Чистка кондиционеров",
+    "Заправка фреоном",
+    "Диагностика неисправностей",
+    "Ремонт кондиционеров",
+    "Профилактическое обслуживание"
+  ],
+
+  faq: [
+    {
+      q: "Сколько времени занимает установка?",
+      a: "В среднем от 1 до 3 часов, в зависимости от сложности и условий монтажа."
+    },
+    {
+      q: "Работаете ли вы со всеми марками кондиционеров?",
+      a: "Да, мы обслуживаем все бытовые и полупромышленные модели."
+    },
+    {
+      q: "Есть ли гарантия на работы?",
+      a: "Гарантия на установку — 1 год. На другие виды работ — по договорённости с мастером."
+    }
+  ],
+
+  ui: {
+    themeDefault: "light",        // light | dark
+    airflow: true,                // включает SVG/Canvas поток воздуха
+    airflowSpeed: 0.2,             // очень медленное «дыхание»
+    airflowOpacity: 0.35           // базовая прозрачность потока
+  }
 };
