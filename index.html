@@ -1,313 +1,300 @@
 <!doctype html>
-<html lang="ru" data-theme="light" data-lang="ru">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f5f9fc" />
   <title>BreezeService — сервис кондиционеров в Ташкенте</title>
   <meta name="description" content="BreezeService — сервис кондиционеров в Ташкенте: установка, чистка, ремонт, заправка." />
-  <link rel="stylesheet" href="./styles.css?v=8101" />
+  <link rel="stylesheet" href="./styles.css?v=91001" />
 </head>
 
 <body>
-  <!-- живой “ветер” (фон) -->
-  <div class="bg-wind" aria-hidden="true"></div>
+  <!-- фон (почти белый + холодный градиент) -->
+  <div class="bg" aria-hidden="true"></div>
 
-  <!-- живые потоки воздуха (канвас) -->
-  <canvas id="airflow" class="airflow" aria-hidden="true"></canvas>
+  <!-- ЖИВОЙ поток воздуха: canvas между фоном и панелями -->
+  <canvas id="airflow" aria-hidden="true"></canvas>
 
   <header class="topbar">
-    <div class="wrap topbar-inner glass panel" data-flow-node="brand">
+    <div class="wrap topbar-inner glass panel" data-flow-node="logo">
       <div class="brand">
-        <div class="brand-logo">
+        <div class="brand-logo" aria-label="BreezeService logo">
           <img src="./logo.png" alt="BreezeService" />
         </div>
         <div class="brand-text">
           <div class="brand-name">BreezeService</div>
-          <div class="brand-sub" data-i18n="brandSub">Сервис кондиционеров • Ташкент</div>
+          <div class="brand-sub">Сервис кондиционеров • Ташкент</div>
         </div>
       </div>
 
-      <div class="controls">
-        <div class="seg glass" role="group" aria-label="Language">
-          <button class="seg-btn" data-lang-btn="ru" type="button">RU</button>
-          <button class="seg-btn" data-lang-btn="en" type="button">EN</button>
-          <button class="seg-btn" data-lang-btn="uz" type="button">UZ</button>
-          <span class="seg-pill" aria-hidden="true"></span>
-        </div>
-
-        <button class="theme-toggle glass" id="themeToggle" type="button" aria-label="Theme">
-          <span class="dot"></span>
-          <span data-i18n="theme">Тема</span>
-        </button>
-      </div>
+      <nav class="nav">
+        <a href="#services">Услуги</a>
+        <a href="#pricing">Цены</a>
+        <a href="#faq">FAQ</a>
+        <a href="#request">Заявка</a>
+      </nav>
 
       <div class="top-actions">
-        <a class="btn glass" id="callBtnTop" href="tel:+998910094469">
+        <a class="btn glass" href="tel:+998910094469">
           <span class="ico" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.5 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.7 3.8.7.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.9 21 3 13.1 3 3c0-.6.4-1 1-1h2.6c.6 0 1 .4 1 1 0 1.3.2 2.6.7 3.8.1.4 0 .8-.2 1.1L6.6 10.8z"/></svg>
           </span>
-          <span data-i18n="call">Позвонить</span>
+          Позвонить
         </a>
-
-        <a class="btn primary" href="#request" id="requestBtnTop">
+        <a class="btn primary" href="#request">
           <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2zM19 13l.7 2.8L22 17l-2.3.9L19 21l-.7-3.1L16 17l2.3-1.2L19 13z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2z"/></svg>
           </span>
-          <span data-i18n="request">Заявка</span>
+          Заявка
         </a>
       </div>
     </div>
   </header>
 
   <main class="wrap main">
-    <!-- HERO -->
-    <section class="hero glass panel" id="heroPanel" data-flow-node="hero">
-      <div class="hero-kicker" data-i18n="kicker">ТАШКЕНТ • КЛИМАТ-СЕРВИС</div>
-      <h1 class="hero-title" data-i18n="heroTitle">BreezeService — сервис кондиционеров в Ташкенте</h1>
-      <p class="hero-lead" data-i18n="heroLead">
-        Помогаем частным клиентам и объектам любого масштаба: от чистки до установки и ремонта. Один звонок — консультация — выезд мастера без лишних сложностей.
+    <!-- HERO / ОПИСАНИЕ -->
+    <section class="hero glass panel float-a" id="hero" data-flow-node="form">
+      <div class="kicker">ТАШКЕНТ • КЛИМАТ-СЕРВИС</div>
+      <h1 class="title">BreezeService — сервис кондиционеров в Ташкенте</h1>
+      <p class="lead">
+        BreezeService — это сервис по обслуживанию кондиционеров в Ташкенте.
+        Мы помогаем частным клиентам и объектам любого масштаба быстро решать проблемы с климатической техникой: от простой чистки до установки и крупных проектов с несколькими кондиционерами.
+      </p>
+      <p class="lead">
+        Наша задача — сделать процесс простым и понятным: один звонок, чёткая консультация и выезд мастера без лишних сложностей.
       </p>
 
-      <!-- услуги как iOS-плитки -->
-      <div class="tiles" id="serviceTiles">
-        <button class="tile glass" type="button" data-service="install" data-flow-node="tile">
-          <span class="tile-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4V7zm2 2v6h12V9H6z"/></svg>
-          </span>
-          <span class="tile-t" data-i18n="sInstall">Установка</span>
-        </button>
-
-        <button class="tile glass" type="button" data-service="clean" data-flow-node="tile">
-          <span class="tile-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2c3 4-1 6-1 9s3 4 3 6-2 5-2 5 6-4 6-9c0-4-3-7-6-11z"/></svg>
-          </span>
-          <span class="tile-t" data-i18n="sClean">Чистка</span>
-        </button>
-
-        <button class="tile glass" type="button" data-service="repair" data-flow-node="tile">
-          <span class="tile-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M21 7l-6 6-4-4 6-6a5 5 0 0 1 4 4zM3 21l7-2-5-5-2 7z"/></svg>
-          </span>
-          <span class="tile-t" data-i18n="sRepair">Ремонт</span>
-        </button>
-
-        <button class="tile glass" type="button" data-service="freon" data-flow-node="tile">
-          <span class="tile-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M7 2h10v6H7V2zm2 2v2h6V4H9zm-2 6h10v12H7V10zm2 2v8h6v-8H9z"/></svg>
-          </span>
-          <span class="tile-t" data-i18n="sFreon">Заправка фреоном</span>
-        </button>
-
-        <button class="tile glass" type="button" data-service="diag" data-flow-node="tile">
-          <span class="tile-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M10 2h4v2h-4V2zM4 6h16v2H4V6zm2 4h12v12H6V10zm2 2v8h8v-8H8z"/></svg>
-          </span>
-          <span class="tile-t" data-i18n="sDiag">Диагностика</span>
-        </button>
-      </div>
-
       <div class="hero-actions">
-        <a class="btn primary" href="#request">
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2z"/></svg>
-          </span>
-          <span data-i18n="leaveRequest">Заявка</span>
-        </a>
-
-        <a class="btn glass" href="tel:+998910094469">
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.5 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.7 3.8.7.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.9 21 3 13.1 3 3c0-.6.4-1 1-1h2.6c.6 0 1 .4 1 1 0 1.3.2 2.6.7 3.8.1.4 0 .8-.2 1.1L6.6 10.8z"/></svg>
-          </span>
-          <span data-i18n="call">Позвонить</span>
-        </a>
+        <a class="btn primary" href="#request">Оставить заявку</a>
+        <a class="btn glass" href="tel:+998910094469">Позвонить</a>
       </div>
 
-      <div class="messengers">
-        <a class="chip glass" id="tgBtn" href="https://t.me/breezeserv1se" target="_blank" rel="noopener">
-          <span class="chip-ico" aria-hidden="true">
+      <div class="chips">
+        <a class="chip glass" href="https://t.me/breezeserv1se" target="_blank" rel="noopener">
+          <span class="mini-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M21 4L3.7 11.3c-1.2.5-1.2 1.2-.2 1.5l4.4 1.4 1.7 5.2c.2.6.3.6.7.2l2.5-2.4 5.2 3.8c1 .5 1.6.2 1.8-.9L23 5.7C23.2 4.5 22.6 3.6 21 4zM9.1 14.8l9.6-6.1c.4-.2.8.1.5.4l-7.7 7c-.3.3-.5.7-.6 1.1l-.2 1.6-1.6-4.9z"/></svg>
           </span>
-          <span>Telegram</span>
+          Telegram
         </a>
-
-        <a class="chip glass" id="waBtn" href="https://wa.me/998910094469" target="_blank" rel="noopener">
-          <span class="chip-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20z"/></svg>
+        <a class="chip glass" href="https://wa.me/998910094469" target="_blank" rel="noopener">
+          <span class="mini-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
           </span>
-          <span>WhatsApp</span>
+          WhatsApp
         </a>
-
-        <a class="chip glass" id="igBtn" href="https://instagram.com/breezeservise.uz" target="_blank" rel="noopener">
-          <span class="chip-ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3z"/></svg>
+        <a class="chip glass" href="https://instagram.com/breezeservise.uz" target="_blank" rel="noopener">
+          <span class="mini-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm6.3-2.2a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
           </span>
-          <span>Instagram</span>
+          Instagram
         </a>
-      </div>
-
-      <div class="bullets">
-        <div class="bullet">
-          <span class="b-dot ok"></span>
-          <span data-i18n="bullet1">Гарантия на установку — 1 год</span>
-        </div>
-        <div class="bullet">
-          <span class="b-dot warn"></span>
-          <span data-i18n="bullet2">Оплата по факту выполненной работы</span>
-        </div>
       </div>
     </section>
 
-    <!-- PRICING -->
-    <section class="section glass panel" id="pricing" data-flow-node="pricing">
+    <!-- УСЛУГИ -->
+    <section class="section glass panel float-b" id="services">
       <div class="section-head">
-        <div class="h" data-i18n="pricingH">Стоимость</div>
-        <div class="p" data-i18n="pricingLead">Стоимость не фиксирована — зависит от задач</div>
+        <h2>Чем мы занимаемся</h2>
+        <p>Мы предоставляем полный спектр услуг по кондиционерам.</p>
       </div>
 
-      <div class="cards grid3" id="priceCards">
-        <article class="card glass">
-          <div class="tag" data-i18n="pTag1">Чистка</div>
-          <ul class="list">
-            <li data-i18n="p1a">Чистка блоков</li>
-            <li data-i18n="p1b">Проверка работы</li>
-            <li data-i18n="p1c">Рекомендации</li>
-          </ul>
-        </article>
+      <div class="tiles" data-flow-node="services">
+        <div class="tile glass" data-flow-node="s1">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4V7zm2 2v6h12V9H6z"/></svg>
+          </div>
+          <div class="tile-title">Установка кондиционеров</div>
+          <div class="tile-sub">Бытовые и полупромышленные</div>
+        </div>
 
-        <article class="card glass">
-          <div class="tag" data-i18n="pTag2">Установка</div>
-          <ul class="list">
-            <li data-i18n="p2a">Подбор решения</li>
-            <li data-i18n="p2b">Проверка запуска</li>
-            <li data-i18n="p2c">Гарантия 1 год</li>
-          </ul>
-        </article>
+        <div class="tile glass" data-flow-node="s2">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2c3 4-1 6-1 9s3 4 3 6-2 5-2 5 6-4 6-9c0-4-3-7-6-11z"/></svg>
+          </div>
+          <div class="tile-title">Чистка блоков</div>
+          <div class="tile-sub">Внутренних и наружных</div>
+        </div>
 
-        <article class="card glass">
-          <div class="tag" data-i18n="pTag3">Ремонт/Диагностика</div>
-          <ul class="list">
-            <li data-i18n="p3a">Диагностика</li>
-            <li data-i18n="p3b">Согласование цены</li>
-            <li data-i18n="p3c">Ремонт по факту</li>
-          </ul>
-        </article>
+        <div class="tile glass" data-flow-node="s3">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M21 7l-6 6-4-4 6-6a5 5 0 0 1 4 4zM3 21l7-2-5-5-2 7z"/></svg>
+          </div>
+          <div class="tile-title">Ремонт и диагностика</div>
+          <div class="tile-sub">Устранение неполадок</div>
+        </div>
+
+        <div class="tile glass" data-flow-node="s4">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 2h10v6H7V2zm2 2v2h6V4H9zm-2 6h10v12H7V10zm2 2v8h6v-8H9z"/></svg>
+          </div>
+          <div class="tile-title">Заправка фреоном</div>
+          <div class="tile-sub">Проверка утечек</div>
+        </div>
+
+        <div class="tile glass" data-flow-node="s5">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 6h14v2H5V6zm2 4h10v10H7V10zm2 2v6h6v-6H9z"/></svg>
+          </div>
+          <div class="tile-title">Профилактика</div>
+          <div class="tile-sub">Чтобы работало тихо и чисто</div>
+        </div>
+
+        <div class="tile glass" data-flow-node="s6">
+          <div class="tile-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>
+          </div>
+          <div class="tile-title">Демонтаж</div>
+          <div class="tile-sub">Аккуратно и безопасно</div>
+        </div>
       </div>
 
-      <div class="note glass">
-        <span class="note-tag" data-i18n="noteTag">Важно</span>
-        <span data-i18n="noteText">Перед выездом вы всегда получаете предварительную консультацию по телефону.</span>
+      <div class="note">
+        Работаем со всеми марками и моделями кондиционеров — бытовыми и полупромышленными.
+      </div>
+    </section>
+
+    <!-- ЦЕНЫ -->
+    <section class="section glass panel float-c" id="pricing" data-flow-node="pricing">
+      <div class="section-head">
+        <h2>Цены</h2>
+        <p>Стоимость услуг не фиксированная и зависит от сложности работы, количества кондиционеров, условий монтажа и состояния оборудования.</p>
+      </div>
+
+      <div class="cards">
+        <div class="card glass">
+          <div class="card-title">От чего зависит стоимость</div>
+          <ul>
+            <li>сложности работы</li>
+            <li>количества кондиционеров</li>
+            <li>условий монтажа</li>
+            <li>состояния оборудования</li>
+          </ul>
+        </div>
+
+        <div class="card glass">
+          <div class="card-title">Перед выездом</div>
+          <p>Перед выездом вы всегда получаете предварительную консультацию по телефону.</p>
+        </div>
+
+        <div class="card glass">
+          <div class="card-title">Крупные объекты</div>
+          <p>Проводится предварительная оценка, составляется смета, на объект может выезжать несколько мастеров.</p>
+        </div>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="section glass panel" id="faq" data-flow-node="faq">
+    <section class="section glass panel float-d" id="faq" data-flow-node="faq">
       <div class="section-head">
-        <div class="h">FAQ</div>
-        <div class="p" data-i18n="faqLead">Гарантии и частые вопросы.</div>
+        <h2>FAQ</h2>
+        <p>Гарантии и частые вопросы.</p>
       </div>
 
       <div class="faq">
         <div class="faq-item glass">
           <button class="faq-q" type="button">
-            <span data-i18n="faqQ1">Какая гарантия?</span>
+            <span>Сколько по времени занимает работа?</span>
             <span class="chev" aria-hidden="true"></span>
           </button>
           <div class="faq-a">
-            <div class="faq-a-inner" data-i18n="faqA1">Гарантия на установку — 1 год. На остальные работы — по договорённости с мастером.</div>
+            <div class="faq-a-inner">Обычно 1–3 часа в зависимости от объёма.</div>
           </div>
         </div>
 
         <div class="faq-item glass">
           <button class="faq-q" type="button">
-            <span data-i18n="faqQ2">Как формируется цена?</span>
+            <span>Нужен ли доступ с улицы?</span>
             <span class="chev" aria-hidden="true"></span>
           </button>
           <div class="faq-a">
-            <div class="faq-a-inner" data-i18n="faqA2">Зависит от сложности, количества кондиционеров, условий монтажа и состояния оборудования.</div>
+            <div class="faq-a-inner">Иногда — зависит от расположения наружного блока.</div>
           </div>
         </div>
 
         <div class="faq-item glass">
           <button class="faq-q" type="button">
-            <span data-i18n="faqQ3">Работаете с крупными объектами?</span>
+            <span>Какая гарантия?</span>
             <span class="chev" aria-hidden="true"></span>
           </button>
           <div class="faq-a">
-            <div class="faq-a-inner" data-i18n="faqA3">Да: офисы, магазины, коммерческие помещения и дома с несколькими кондиционерами. Делаем оценку и смету.</div>
+            <div class="faq-a-inner">Гарантия на установку — 1 год. Гарантию на другие виды работ предоставляет мастер, который выполнял заказ.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- REQUEST -->
-    <section class="section glass panel" id="request" data-flow-node="request">
+    <!-- ЗАЯВКА / КОНТАКТЫ -->
+    <section class="section glass panel float-e" id="request" data-flow-node="contact">
       <div class="section-head">
-        <div class="h" data-i18n="reqH">Заявка</div>
-        <div class="p" data-i18n="reqLead">Заполни форму — откроем мессенджер с готовым текстом.</div>
+        <h2>Контакты</h2>
+        <p>Мы отвечаем максимально быстро и стараемся подобрать удобное время для выезда мастера.</p>
       </div>
 
-      <form class="form glass" id="reqForm">
-        <div class="row2">
-          <label>
-            <span data-i18n="name">Имя</span>
-            <input id="nameInput" autocomplete="name" placeholder="Ваше имя" />
-          </label>
-          <label>
-            <span data-i18n="phone">Телефон</span>
-            <input id="phoneInput" inputmode="tel" autocomplete="tel" placeholder="+998..." />
-          </label>
+      <div class="contact-grid">
+        <div class="contact-card glass">
+          <div class="contact-title">Заявка</div>
+          <p>Заполни форму — и мы ответим в ближайшее время.</p>
+
+          <form id="leadForm" class="form">
+            <label>
+              Имя
+              <input id="name" autocomplete="name" placeholder="Ваше имя" />
+            </label>
+            <label>
+              Телефон
+              <input id="phone" inputmode="tel" autocomplete="tel" placeholder="+998..." />
+            </label>
+            <label>
+              Сообщение
+              <textarea id="msg" placeholder="Опишите, что нужно сделать (по желанию)"></textarea>
+            </label>
+            <div class="form-actions">
+              <button type="button" class="btn primary" id="sendWA">WhatsApp</button>
+              <button type="button" class="btn glass" id="sendTG">Telegram</button>
+            </div>
+          </form>
         </div>
 
-        <label>
-          <span data-i18n="service">Услуга</span>
-          <input type="hidden" id="serviceHidden" value="install" />
-          <div class="segmented glass" id="serviceChips">
-            <button type="button" class="seg-chip active" data-val="install" data-i18n="sInstall">Установка</button>
-            <button type="button" class="seg-chip" data-val="clean" data-i18n="sClean">Чистка</button>
-            <button type="button" class="seg-chip" data-val="repair" data-i18n="sRepair">Ремонт</button>
-            <button type="button" class="seg-chip" data-val="freon" data-i18n="sFreon">Заправка фреоном</button>
-            <button type="button" class="seg-chip" data-val="diag" data-i18n="sDiag">Диагностика</button>
+        <div class="contact-card glass">
+          <div class="contact-title">География</div>
+          <p>Работаем по всему Ташкенту. Возможен выезд за город (до 1–2 км) — по договорённости.</p>
+
+          <div class="contact-title" style="margin-top:14px">Контакты</div>
+          <div class="contact-lines">
+            <a class="line" href="tel:+998910094469">
+              <span class="line-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.5 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.7 3.8.7.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.9 21 3 13.1 3 3c0-.6.4-1 1-1h2.6c.6 0 1 .4 1 1 0 1.3.2 2.6.7 3.8.1.4 0 .8-.2 1.1L6.6 10.8z"/></svg>
+              </span>
+              <span>+998 91 009 44 69</span>
+            </a>
+
+            <a class="line" href="https://instagram.com/breezeservise.uz" target="_blank" rel="noopener">
+              <span class="line-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3z"/></svg>
+              </span>
+              <span>Instagram: breezeservise.uz</span>
+            </a>
+
+            <a class="line" href="https://t.me/breezeserv1se" target="_blank" rel="noopener">
+              <span class="line-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M21 4L3.7 11.3c-1.2.5-1.2 1.2-.2 1.5l4.4 1.4 1.7 5.2c.2.6.3.6.7.2l2.5-2.4 5.2 3.8c1 .5 1.6.2 1.8-.9L23 5.7C23.2 4.5 22.6 3.6 21 4z"/></svg>
+              </span>
+              <span>Telegram: @breezeserv1se</span>
+            </a>
           </div>
-        </label>
 
-        <label>
-          <span data-i18n="comment">Комментарий</span>
-          <textarea id="commentInput" placeholder="Опишите проблему (по желанию)"></textarea>
-        </label>
-
-        <div class="form-actions">
-          <button class="btn primary" type="button" id="sendWA">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-            </span>
-            <span data-i18n="sendWA">Отправить в WhatsApp</span>
-          </button>
-
-          <button class="btn glass" type="button" id="sendTG">
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M21 4L3.7 11.3c-1.2.5-1.2 1.2-.2 1.5l4.4 1.4 1.7 5.2c.2.6.3.6.7.2l2.5-2.4 5.2 3.8c1 .5 1.6.2 1.8-.9L23 5.7C23.2 4.5 22.6 3.6 21 4z"/></svg>
-            </span>
-            <span data-i18n="sendTG">Отправить в Telegram</span>
-          </button>
+          <div class="foot-note">Звонки принимаем: с 10:00 до 18:00</div>
         </div>
-
-        <div class="small" data-i18n="afterSubmit">Мы отвечаем максимально быстро и стараемся подобрать удобное время для выезда мастера.</div>
-      </form>
+      </div>
     </section>
 
-    <footer class="footer">
-      <div class="footer-inner glass panel" data-flow-node="footer">
-        <div>© <span id="year"></span> BreezeService</div>
-        <div class="footer-links">
-          <a href="https://instagram.com/breezeservise.uz" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://t.me/breezeserv1se" target="_blank" rel="noopener">Telegram</a>
-        </div>
-      </div>
+    <footer class="footer glass panel">
+      <div>© <span id="year"></span> BreezeService</div>
     </footer>
   </main>
 
-  <script src="./config.js?v=8101"></script>
-  <script src="./site.js?v=8101"></script>
+  <script src="./config.js?v=91001"></script>
+  <script src="./site.js?v=91001"></script>
 </body>
 </html>
