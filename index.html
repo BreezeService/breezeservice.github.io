@@ -1,253 +1,170 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f7fbff" />
-  <title>BreezeServis — сервис кондиционеров в Ташкенте</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BreezeServis — сервис кондиционеров + магазин</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="airflow"></div>
 
-  <!-- Inter (close to SF Pro vibe on web) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="./styles.css?v=12001" />
-</head>
-
-<body>
-  <!-- Clean airy background -->
-  <div class="bg" aria-hidden="true"></div>
-
-  <!-- Airflow layer (behind panels) -->
-  <canvas id="airflow" aria-hidden="true"></canvas>
-
-  <!-- TOP NAV -->
-  <header class="top">
     <div class="wrap">
-      <div class="nav glass panel" data-node="nav">
-        <a class="brand" href="#top">
-          <span class="brand-mark" aria-label="BreezeServis logo">
-            <img src="./logo.png" alt="BreezeServis" />
-          </span>
-          <span class="brand-name">BreezeServis</span>
-        </a>
-
-        <nav class="menu" aria-label="Основное меню">
-          <a href="#services">Услуги</a>
-          <a href="#prices">Цены</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-
-        <div class="nav-right">
-          <a class="phone" href="tel:+998910094469">+998 91 009 44 69</a>
-          <a class="btn glass cta" href="#request">Оставить заявку</a>
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1 id="brandName">BreezeServis</h1>
+            <p id="brandTagline">Сервис кондиционеров + магазин</p>
+          </div>
         </div>
+
+        <nav class="nav">
+          <a class="chip" href="#services">Услуги</a>
+          <a class="chip" href="#store">Магазин</a>
+          <a class="chip" href="#booking">Заявка</a>
+          <button class="chip" id="openCart" type="button">
+            Корзина • <b id="cartCount">0</b>
+          </button>
+        </nav>
+      </header>
+
+      <main class="grid">
+        <section class="panel hero">
+          <h2 id="heroTitle">Чистка • Ремонт • Установка</h2>
+          <p id="heroSubtitle">
+            Премиальный сервис кондиционеров по всему городу. Быстро, аккуратно, с гарантией.
+            А ещё — магазин расходников и техники для мастеров.
+          </p>
+
+          <div class="actions" id="heroActions"></div>
+
+          <div class="stats" id="stats"></div>
+        </section>
+
+        <aside class="panel side">
+          <h3>Контакты</h3>
+          <div class="row"><span class="small">Город</span><span class="badge" id="city">Ташкент</span></div>
+          <div class="row"><span class="small">Поддержка</span><span class="badge" id="hours">09:00–21:00</span></div>
+          <div class="row"><span class="small">Телефон</span><span class="badge" id="phone">+998 90 000 00 00</span></div>
+
+          <div class="section" style="margin-top:14px">
+            <h3 style="margin:0 0 10px">Партнёры</h3>
+            <div class="kv" id="partners"></div>
+          </div>
+
+          <div class="section" style="margin-top:14px">
+            <h3 style="margin:0 0 10px">Почему мы</h3>
+            <div class="small" style="line-height:1.5">
+              • аккуратная работа без “колхоза”<br />
+              • честные цены и понятная смета<br />
+              • быстро отвечаем и подтверждаем время
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <section class="section" id="services">
+        <div class="sectionHeader">
+          <div>
+            <h3>Услуги</h3>
+            <p>Выбирай услугу — и сразу оставляй заявку.</p>
+          </div>
+        </div>
+        <div class="cards" id="services"></div>
+      </section>
+
+      <section class="section" id="store">
+        <div class="sectionHeader">
+          <div>
+            <h3>Магазин</h3>
+            <p>Товары (демо) — подключим реальные позиции через config.js.</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <input id="search" placeholder="Поиск…" style="max-width:220px" />
+            <select id="category"></select>
+          </div>
+        </div>
+
+        <div class="storeGrid" id="storeGrid"></div>
+      </section>
+
+      <section class="section" id="booking">
+        <div class="sectionHeader">
+          <div>
+            <h3>Заявка</h3>
+            <p>Заполни форму — в этой версии это демо (без отправки на сервер).</p>
+          </div>
+        </div>
+
+        <div class="panel" style="padding:16px">
+          <form class="form" id="bookingForm">
+            <div class="field">
+              <label>Услуга</label>
+              <select id="serviceSelect" required></select>
+            </div>
+
+            <div class="field">
+              <label>Имя</label>
+              <input id="bName" placeholder="Как к тебе обращаться" required />
+            </div>
+
+            <div class="field">
+              <label>Телефон</label>
+              <input id="bPhone" placeholder="+998 __ ___ __ __" required />
+            </div>
+
+            <div class="field">
+              <label>Адрес / ориентир</label>
+              <input id="bAddr" placeholder="Например: Чиланзар, возле метро…" />
+            </div>
+
+            <div class="field">
+              <label>Комментарий</label>
+              <textarea id="bNote" placeholder="Что случилось? Модель? Ошибка? Когда удобно?"></textarea>
+            </div>
+
+            <button class="btn primary" type="submit" style="width:100%; justify-content:center">
+              Отправить заявку
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="sectionHeader">
+          <div>
+            <h3>Вопросы</h3>
+            <p>Коротко и по делу.</p>
+          </div>
+        </div>
+        <div class="cards" id="faq"></div>
+      </section>
+
+      <footer class="footer">
+        <div>© <span id="brandNameFooter">BreezeServis</span> • Ташкент</div>
+        <div>Собрано как прототип. Дальше подключим: оплату, админку, заявки, партнёров.</div>
+      </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="modal">
+        <div class="modalHeader">
+          <h4 id="modalTitle">Окно</h4>
+          <button class="iconBtn" id="closeModal" type="button" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="modalBody" id="modalContent"></div>
       </div>
     </div>
-  </header>
 
-  <main id="top" class="wrap main">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-inner panel" data-node="hero">
-        <div class="hero-logo glass">
-          <img src="./logo.png" alt="BreezeServis" />
-        </div>
+    <div class="toast" id="toast" role="status"></div>
 
-        <h1 class="h1">Сервис кондиционеров в Ташкенте</h1>
-        <p class="sub">
-          Чисто. Аккуратно. Вовремя. Установка, чистка, заправка и ремонт — без лишних сложностей.
-        </p>
-      </div>
-    </section>
-
-    <!-- MAIN FORM PANEL (ANCHOR) -->
-    <section id="request" class="block">
-      <div class="glass panel form-card" data-node="form">
-        <div class="form-head">
-          <h2 class="h2">Оставить заявку</h2>
-          <p class="muted">Напишите имя и номер — мы быстро свяжемся и уточним детали.</p>
-        </div>
-
-        <form id="leadForm" class="form" autocomplete="on">
-          <div class="grid2">
-            <label class="field">
-              <span>Имя</span>
-              <input id="name" name="name" placeholder="Ваше имя" autocomplete="name" />
-            </label>
-
-            <label class="field">
-              <span>Телефон</span>
-              <input id="phone" name="phone" placeholder="+998 ..." inputmode="tel" autocomplete="tel" />
-            </label>
-          </div>
-
-          <button class="btn primary" type="button" id="sendRequest">
-            Отправить
-          </button>
-
-          <div class="form-hint">
-            Нажимая «Отправить», вы соглашаетесь на связь по указанному номеру.
-          </div>
-        </form>
-      </div>
-
-      <!-- CONTACT BUTTONS -->
-      <div class="contact-row panel" data-node="contacts">
-        <a class="pill glass" target="_blank" rel="noopener" href="https://t.me/breezeserv1se" aria-label="Telegram">
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M21 4L3.7 11.3c-1.2.5-1.2 1.2-.2 1.5l4.4 1.4 1.7 5.2c.2.6.3.6.7.2l2.5-2.4 5.2 3.8c1 .5 1.6.2 1.8-.9L23 5.7C23.2 4.5 22.6 3.6 21 4zM9.1 14.8l9.6-6.1c.4-.2.8.1.5.4l-7.7 7c-.3.3-.5.7-.6 1.1l-.2 1.6-1.6-4.9z"/></svg>
-          </span>
-          Telegram
-        </a>
-
-        <a class="pill glass" target="_blank" rel="noopener" href="https://wa.me/998910094469" aria-label="WhatsApp">
-          <span class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 0 1 6.9 12.1l-.4.7.9 2.8-2.9-.8-.7.4A8 8 0 1 1 12 4z"/></svg>
-          </span>
-          WhatsApp
-        </a>
-      </div>
-    </section>
-
-    <!-- SERVICES (4 CARDS IN ONE ROW) -->
-    <section id="services" class="block">
-      <div class="section-head panel" data-node="servicesHead">
-        <h2 class="h2">Услуги</h2>
-        <p class="muted">Самое частое — быстро и аккуратно.</p>
-      </div>
-
-      <div class="services panel" data-node="services">
-        <article class="glass card" data-node="s1">
-          <div class="icon" aria-hidden="true">
-            <!-- monoline AC -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M5 8.5h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M7 12h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Установка</h3>
-          <p>Монтаж сплит-систем и подбор по условиям.</p>
-        </article>
-
-        <article class="glass card" data-node="s2">
-          <div class="icon" aria-hidden="true">
-            <!-- monoline clean -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M7 4h10v7a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M9 17v3M12 17v3M15 17v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Чистка</h3>
-          <p>Глубокая чистка блоков и профилактика запахов.</p>
-        </article>
-
-        <article class="glass card" data-node="s3">
-          <div class="icon" aria-hidden="true">
-            <!-- monoline gas -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 3h6v6H9V3Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M8 9h8v12H8V9Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M10 13h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Заправка</h3>
-          <p>Фреон, проверка утечек, восстановление холода.</p>
-        </article>
-
-        <article class="glass card" data-node="s4">
-          <div class="icon" aria-hidden="true">
-            <!-- monoline repair -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M14.5 6.5 18 10l-8.5 8.5H6v-3.5L14.5 6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M13 8l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3>Ремонт</h3>
-          <p>Диагностика и устранение неполадок.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- PRICES + FAQ (kept simple, structure matches menu) -->
-    <section id="prices" class="block">
-      <div class="glass panel info">
-        <h2 class="h2">Цены</h2>
-        <p class="muted">
-          Стоимость зависит от сложности, количества кондиционеров, условий монтажа и состояния оборудования.
-          Перед выездом — консультация по телефону.
-        </p>
-      </div>
-    </section>
-
-    <section id="faq" class="block">
-      <div class="glass panel faq" data-node="faq">
-        <div class="section-head-tight">
-          <h2 class="h2">FAQ</h2>
-          <p class="muted">Коротко и по делу.</p>
-        </div>
-
-        <div class="faq-list">
-          <div class="faq-item glass">
-            <button class="faq-q" type="button">
-              <span>Сколько по времени занимает работа?</span>
-              <span class="chev" aria-hidden="true"></span>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner">Обычно 1–3 часа в зависимости от объёма.</div></div>
-          </div>
-
-          <div class="faq-item glass">
-            <button class="faq-q" type="button">
-              <span>Нужен ли доступ с улицы?</span>
-              <span class="chev" aria-hidden="true"></span>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner">Иногда — зависит от расположения наружного блока.</div></div>
-          </div>
-
-          <div class="faq-item glass">
-            <button class="faq-q" type="button">
-              <span>Какая гарантия?</span>
-              <span class="chev" aria-hidden="true"></span>
-            </button>
-            <div class="faq-a"><div class="faq-a-inner">Гарантия на установку — 1 год.</div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER (WIDE GLASS) -->
-    <footer class="glass panel footer" data-node="footer">
-      <div class="footer-left">
-        <div class="qr glass" aria-label="QR placeholder">
-          <div class="qr-inner">
-            <div class="qr-sq"></div><div class="qr-sq"></div><div class="qr-sq"></div>
-            <div class="qr-sq"></div><div class="qr-sq"></div><div class="qr-sq"></div>
-            <div class="qr-sq"></div><div class="qr-sq"></div><div class="qr-sq"></div>
-          </div>
-          <div class="qr-note">QR</div>
-        </div>
-
-        <div class="footer-contacts">
-          <div class="foot-title">BreezeServis</div>
-          <a class="foot-link" href="tel:+998910094469">+998 91 009 44 69</a>
-          <a class="foot-link" target="_blank" rel="noopener" href="https://t.me/breezeserv1se">@breezeserv1se</a>
-          <a class="foot-link" target="_blank" rel="noopener" href="https://instagram.com/breezeservise.uz">breezeservise.uz</a>
-        </div>
-      </div>
-
-      <div class="footer-right">
-        <div class="foot-menu">
-          <a href="#services">Услуги</a>
-          <a href="#prices">Цены</a>
-          <a href="#faq">FAQ</a>
-          <a href="#request">Заявка</a>
-        </div>
-        <div class="copy">© <span id="year"></span> BreezeServis</div>
-      </div>
-    </footer>
-  </main>
-
-  <script src="./config.js?v=12001"></script>
-  <script src="./site.js?v=12001"></script>
-</body>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+      document.getElementById('brandNameFooter').textContent =
+        window.APP_CONFIG?.brand?.name || 'BreezeServis';
+    </script>
+  </body>
 </html>
