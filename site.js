@@ -1,272 +1,368 @@
 (() => {
-  const $ = (s, r=document) => r.querySelector(s);
-  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // ====== basic
-  $("#year").textContent = String(new Date().getFullYear());
+  const cfg = window.APP_CONFIG;
 
-  // smooth anchors
-  $$('a[href^="#"]').forEach(a=>{
-    a.addEventListener("click", (e)=>{
-      const id = a.getAttribute("href");
-      if(!id || id === "#") return;
-      const el = document.querySelector(id);
-      if(!el) return;
-      e.preventDefault();
-      el.scrollIntoView({behavior:"smooth", block:"start"});
-      history.replaceState(null,"",id);
-    }, {passive:false});
+  if (cfg?.brand?.accent) {
+    document.documentElement.style.setProperty("--accent", cfg.brand.accent);
+  }
+
+  $("#brandName").textContent = cfg.brand.name;
+  $("#brandTagline").textContent = cfg.brand.tagline;
+
+  $("#city").textContent = cfg.brand.city;
+  $("#hours").textContent = cfg.brand.supportHours;
+  $("#phone").textContent = cfg.brand.phone;
+
+  $("#heroTitle").textContent = cfg.hero.title;
+  $("#heroSubtitle").textContent = cfg.hero.subtitle;
+
+  const actions = $("#heroActions");
+  cfg.hero.ctas.forEach((c) => {
+    const a = document.createElement("a");
+    a.href = c.href;
+    a.className = `btn ${c.variant === "ghost" ? "ghost" : "primary"}`;
+    a.textContent = c.label;
+    actions.appendChild(a);
   });
 
-  // FAQ smooth
-  $$(".faq-q").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const item = btn.closest(".faq-item");
-      const now = item.classList.toggle("open");
-      if(now){
-        $$(".faq-item.open").forEach(x=>{ if(x!==item) x.classList.remove("open"); });
-      }
-    }, {passive:true});
+  const stats = $("#stats");
+  cfg.stats.forEach((s) => {
+    const el = document.createElement("div");
+    el.className = "mini";
+    el.innerHTML = `<div class="v">${escapeHtml(s.value)}</div><div class="k">${escapeHtml(s.label)}</div>`;
+    stats.appendChild(el);
   });
 
-  // simple request -> opens WhatsApp with filled message
-  const phoneRaw = (window.SITE_CONFIG?.phone || "+998910094469").replace(/\s+/g,"");
-  const waNumber = phoneRaw.replace("+","");
-  const tgLink = window.SITE_CONFIG?.telegram || "https://t.me/breezeserv1se";
+  const servicesWrap = $("#services");
+  cfg.services.forEach((svc) => {
+    const el = document.createElement("div");
+    el.className = "card";
 
-  $("#sendRequest").addEventListener("click", ()=>{
-    const name = ($("#name").value || "").trim();
-    const phone = ($("#phone").value || "").trim();
-    const text =
-`BreezeServis — заявка
-Имя: ${name || "-"}
-Телефон: ${phone || "-"}
-`;
-    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank", "noopener");
-  }, {passive:true});
+    const badge = svc.badge ? `<span class="badge">${escapeHtml(svc.badge)}</span>` : "";
 
-  // ====== Airflow Canvas (true "fog ribbon" flow)
-  const canvas = $("#airflow");
-  const ctx = canvas.getContext("2d", { alpha:true, desynchronized:true });
-
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const lerp = (a,b,t) => a + (b-a)*t;
-
-  let dpr = 1, W = 0, H = 0;
-  let t = 0;
-  let last = 0;
-
-  // interaction boost (hover + scroll)
-  const focus = { x: -9999, y: -9999, a: 0 };
-  let scrollBoost = 0;
-
-  function setFocusFromEl(el, strength=1){
-    const r = el.getBoundingClientRect();
-    focus.x = r.left + r.width/2;
-    focus.y = r.top + r.height/2;
-    focus.a = strength;
-  }
-
-  // Hover on any glass panel boosts air locally
-  const hoverables = $$(".glass");
-  hoverables.forEach(el=>{
-    el.addEventListener("pointerenter", ()=> setFocusFromEl(el, 1), {passive:true});
-    el.addEventListener("pointerleave", ()=> { focus.a = 0; }, {passive:true});
+    el.innerHTML = `
+      <div class="cardTop">
+        <div>
+          <h4>${escapeHtml(svc.title)}</h4>
+          <div class="meta">
+            <span>от <span class="price">${fmtMoney(svc.priceFrom)}</span></span>
+            <span>•</span>
+            <span>${escapeHtml(svc.time)}</span>
+          </div>
+        </div>
+        ${badge}
+      </div>
+      <ul class="ul">
+        ${svc.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("")}
+      </ul>
+      <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn ghost" data-book="${svc.id}">Записаться</button>
+        <button class="btn primary" data-quick="${svc.id}">Быстрый запрос</button>
+      </div>
+    `;
+    servicesWrap.appendChild(el);
   });
 
-  window.addEventListener("scroll", ()=>{ scrollBoost = 1; }, {passive:true});
+  const store = $("#storeGrid");
+  const categorySelect = $("#category");
+  const searchInput = $("#search");
 
-  function resize(){
-    const cap = clamp(window.devicePixelRatio || 1, 1, 1.6);
-    const w = Math.floor(window.innerWidth);
-    const h = Math.floor(window.innerHeight);
-    if(w === W && h === H && cap === dpr) return;
+  const categories = ["Все", ...new Set(cfg.products.map((p) => p.category))];
+  categories.forEach((c) => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    categorySelect.appendChild(opt);
+  });
 
-    dpr = cap; W = w; H = h;
-    canvas.width = Math.floor(W * dpr);
-    canvas.height = Math.floor(H * dpr);
-    canvas.style.width = W + "px";
-    canvas.style.height = H + "px";
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  window.addEventListener("resize", resize, {passive:true});
-  resize();
+  const cart = new Map(); // id -> qty
 
-  function nodeCenter(sel){
-    const el = $(sel);
-    if(!el) return null;
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width/2, y: r.top + r.height/2 };
-  }
+  function renderProducts() {
+    store.innerHTML = "";
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const cat = categorySelect.value;
 
-  // Build flow route: logo/nav -> form -> services row -> footer
-  function buildRoute(){
-    // Use data-node anchors
-    const nav = $('[data-node="nav"]');
-    const form = $('[data-node="form"]');
-    const services = $('[data-node="services"]');
-    const footer = $('[data-node="footer"]');
-    if(!nav || !form || !services || !footer) return null;
+    const items = cfg.products
+      .filter((p) => (cat === "Все" ? true : p.category === cat))
+      .filter((p) => {
+        if (!q) return true;
+        return (
+          p.title.toLowerCase().includes(q) ||
+          p.desc.toLowerCase().includes(q) ||
+          p.tags.join(" ").toLowerCase().includes(q)
+        );
+      });
 
-    const c = (el)=> {
-      const r = el.getBoundingClientRect();
-      return { x: r.left + r.width/2, y: r.top + r.height/2 };
-    };
-
-    const pNav = c(nav);
-    const pForm = c(form);
-    const pServices = c(services);
-    const pFooter = c(footer);
-
-    const start = { x: -120, y: pNav.y - 20 };
-    const end = { x: W + 120, y: pFooter.y + 110 };
-
-    return [start, pNav, pForm, pServices, pFooter, end];
-  }
-
-  function bezierHandles(a, b, i, amp){
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const sign = (i % 2 === 0) ? 1 : -1;
-
-    return {
-      c1: { x: a.x + dx*0.30, y: a.y + dy*0.12 + sign*amp },
-      c2: { x: a.x + dx*0.72, y: a.y + dy*0.88 - sign*amp },
-    };
-  }
-
-  // Draw "fog ribbon": wide mist + inner core + ultra-soft particles
-  function drawRibbon(a, b, i, strength){
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const dist = Math.hypot(dx, dy);
-
-    const amp = clamp(dist * 0.12, 18, 90);
-    const { c1, c2 } = bezierHandles(a, b, i, amp);
-
-    // Gradient along flow
-    const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-    const breathe = 0.55 + 0.06*Math.sin(t*0.10 + i*0.6);
-    const a1 = 0.10*strength;
-    const a2 = 0.18*strength;
-
-    g.addColorStop(0,   `rgba(255,255,255,${a1})`);
-    g.addColorStop(breathe, `rgba(127,211,255,${a2})`);
-    g.addColorStop(1,   `rgba(95,169,201,${a1})`);
-
-    // Pass 1: wide soft fog band
-    ctx.save();
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = g;
-
-    const baseW = clamp(40 + dist*0.02, 38, 70);
-    const wobble = 1 + 0.06*Math.sin(t*0.22 + i*1.1);
-    ctx.lineWidth = baseW * wobble;
-
-    ctx.shadowColor = `rgba(127,211,255,${0.22*strength})`;
-    ctx.shadowBlur = 26;
-
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, b.x, b.y);
-    ctx.stroke();
-
-    // Pass 2: inner subtle core (still foggy, not neon)
-    const g2 = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-    g2.addColorStop(0, `rgba(255,255,255,${0.12*strength})`);
-    g2.addColorStop(0.5, `rgba(160,235,255,${0.20*strength})`);
-    g2.addColorStop(1, `rgba(255,255,255,${0.10*strength})`);
-
-    ctx.strokeStyle = g2;
-    ctx.lineWidth = clamp(baseW*0.34, 10, 22);
-    ctx.shadowBlur = 18;
-
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, b.x, b.y);
-    ctx.stroke();
-
-    // Pass 3: ultra-soft drifting particles (almost invisible)
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = `rgba(255,255,255,${0.14*strength})`;
-    ctx.lineWidth = 2.4;
-    ctx.setLineDash([16, 26]);
-    ctx.lineDashOffset = -(t*18 + i*14);
-
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, b.x, b.y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.restore();
-  }
-
-  function clearSoft(){
-    // soft fade overlay (prevents harsh flicker, feels “breathing”)
-    ctx.save();
-    ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(247,251,255,0.18)";
-    ctx.fillRect(0,0,W,H);
-    ctx.restore();
-  }
-
-  function frame(ts){
-    if(!last) last = ts;
-    const dt = Math.min(64, ts - last);
-    last = ts;
-    t += dt * 0.001;
-
-    // mobile perf: ~30fps
-    const skip = (W < 720) ? 2 : 1;
-    if(((ts/16)|0) % skip !== 0){
-      requestAnimationFrame(frame);
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "card";
+      empty.style.gridColumn = "1 / -1";
+      empty.innerHTML = `<h4 style="margin:0">Ничего не найдено</h4><p class="small" style="margin:8px 0 0">Попробуй другой запрос или категорию.</p>`;
+      store.appendChild(empty);
       return;
     }
 
-    // ease interaction
-    scrollBoost = Math.max(0, scrollBoost - dt*0.002);
-    focus.a = Math.max(0, focus.a - dt*0.0018);
-
-    resize();
-    clearSoft();
-
-    const route = buildRoute();
-    if(route && route.length > 1){
-      const base = 0.9 + 0.08*Math.sin(t*0.22);
-
-      for(let i=0;i<route.length-1;i++){
-        const a = route[i], b = route[i+1];
-
-        // local boost near focused panel
-        let boost = 1;
-        if(focus.a > 0 || scrollBoost > 0){
-          const mx = (a.x + b.x)/2;
-          const my = (a.y + b.y)/2;
-          const d = Math.hypot(mx - focus.x, my - focus.y);
-          const local = (1 - clamp(d/520, 0, 1));
-          boost += (0.55*focus.a + 0.25*scrollBoost) * local;
-        }
-
-        drawRibbon(a, b, i, base*boost);
-      }
-    }
-
-    // gentle screen blend vignette (keeps it airy)
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-    const vg = ctx.createRadialGradient(W*0.5, H*0.45, W*0.06, W*0.5, H*0.45, W*0.74);
-    vg.addColorStop(0, "rgba(255,255,255,0)");
-    vg.addColorStop(1, "rgba(255,255,255,0.40)");
-    ctx.fillStyle = vg;
-    ctx.fillRect(0,0,W,H);
-    ctx.restore();
-
-    requestAnimationFrame(frame);
+    items.forEach((p) => {
+      const el = document.createElement("div");
+      el.className = "product";
+      const inCart = cart.get(p.id) || 0;
+      el.innerHTML = `
+        <div class="pillRow">
+          <span class="pill">${escapeHtml(p.category)}</span>
+          ${p.stock ? `<span class="pill">В наличии</span>` : `<span class="pill">Под заказ</span>`}
+          ${p.tags.slice(0,2).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join("")}
+        </div>
+        <p class="pTitle">${escapeHtml(p.title)}</p>
+        <p class="pDesc">${escapeHtml(p.desc)}</p>
+        <div class="pFoot">
+          <div>
+            <div class="pPrice">${fmtMoney(p.price)} <span style="font-weight:650; color:rgba(13,27,34,.62)">/ ${escapeHtml(p.unit)}</span></div>
+            <div class="small">${escapeHtml(cfg.brand.city)}</div>
+          </div>
+          <button class="cartBtn" data-add="${p.id}" ${p.stock ? "" : "disabled"}>
+            ${inCart ? `Добавлено (${inCart})` : "В корзину"}
+          </button>
+        </div>
+      `;
+      store.appendChild(el);
+    });
   }
 
-  requestAnimationFrame(frame);
+  categorySelect.addEventListener("change", renderProducts);
+  searchInput.addEventListener("input", debounce(renderProducts, 120));
+
+  const partnerWrap = $("#partners");
+  cfg.partners.forEach((p) => {
+    const b = document.createElement("span");
+    b.className = "badge";
+    b.textContent = `${p.name} • ${p.note}`;
+    partnerWrap.appendChild(b);
+  });
+
+  const faq = $("#faq");
+  cfg.faqs.forEach((f) => {
+    const el = document.createElement("div");
+    el.className = "card";
+    el.innerHTML = `
+      <h4 style="margin:0">${escapeHtml(f.q)}</h4>
+      <p class="small" style="margin:8px 0 0; line-height:1.45;">${escapeHtml(f.a)}</p>
+    `;
+    faq.appendChild(el);
+  });
+
+  const bookingForm = $("#bookingForm");
+  const serviceSelect = $("#serviceSelect");
+  cfg.services.forEach((s) => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.title;
+    serviceSelect.appendChild(opt);
+  });
+
+  $$('a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const id = a.getAttribute("href");
+      if (!id || id === "#") return;
+      const t = document.querySelector(id);
+      if (!t) return;
+      e.preventDefault();
+      t.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    const book = e.target.closest("[data-book]");
+    const quick = e.target.closest("[data-quick]");
+    const add = e.target.closest("[data-add]");
+
+    if (book) {
+      const id = book.getAttribute("data-book");
+      serviceSelect.value = id;
+      $("#booking").scrollIntoView({ behavior: "smooth" });
+      toast("Выбрана услуга — заполни заявку");
+    }
+
+    if (quick) {
+      const id = quick.getAttribute("data-quick");
+      const svc = cfg.services.find((s) => s.id === id);
+      openModal("Быстрый запрос", `
+        <p class="small" style="margin:0 0 10px">Услуга: <b>${escapeHtml(svc?.title || "")}</b></p>
+        <p class="small" style="margin:0 0 12px">Оставь телефон — мы перезвоним в течение дня.</p>
+        <div class="field">
+          <label>Телефон</label>
+          <input id="quickPhone" placeholder="+998 __ ___ __ __" />
+        </div>
+        <button class="btn primary" id="quickSend" style="width:100%; justify-content:center">Отправить</button>
+      `);
+
+      setTimeout(() => {
+        $("#quickSend")?.addEventListener("click", () => {
+          const phone = $("#quickPhone")?.value?.trim();
+          if (!phone) return toast("Введи телефон");
+          closeModal();
+          toast("Заявка отправлена (демо)");
+        });
+      }, 0);
+    }
+
+    if (add) {
+      const id = add.getAttribute("data-add");
+      cart.set(id, (cart.get(id) || 0) + 1);
+      renderProducts();
+      updateCartBadge();
+      toast("Добавлено в корзину");
+    }
+  });
+
+  bookingForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("#bName").value.trim();
+    const phone = $("#bPhone").value.trim();
+    if (!name || !phone) return toast("Заполни имя и телефон");
+    toast("Заявка отправлена (демо)");
+    bookingForm.reset();
+  });
+
+  $("#openCart").addEventListener("click", () => openCart());
+
+  function openCart() {
+    const items = Array.from(cart.entries());
+    if (!items.length) {
+      openModal("Корзина", `<p class="small" style="margin:0">Пока пусто. Добавь товары из каталога.</p>`);
+      return;
+    }
+
+    const rows = items.map(([id, qty]) => {
+      const p = cfg.products.find((x) => x.id === id);
+      const subtotal = (p?.price || 0) * qty;
+      return `
+        <div class="cartItem" data-item="${id}">
+          <div>
+            <div style="font-weight:750">${escapeHtml(p?.title || id)}</div>
+            <div class="small">${fmtMoney(p?.price || 0)} / ${escapeHtml(p?.unit || "")}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="qty">
+              <button data-dec="${id}">−</button>
+              <span>${qty}</span>
+              <button data-inc="${id}">+</button>
+            </div>
+            <div class="small" style="margin-top:6px">${fmtMoney(subtotal)}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    const total = items.reduce((sum, [id, qty]) => {
+      const p = cfg.products.find((x) => x.id === id);
+      return sum + (p?.price || 0) * qty;
+    }, 0);
+
+    openModal("Корзина", `
+      <div>${rows}</div>
+      <div class="line"></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+          <div style="font-weight:800">Итого</div>
+          <div class="small">Доставка/установка — по договоренности</div>
+        </div>
+        <div style="font-weight:900; font-size:18px; letter-spacing:-.2px;">${fmtMoney(total)}</div>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn ghost" id="clearCart">Очистить</button>
+        <button class="btn primary" id="checkout" style="flex:1; justify-content:center">Оформить (демо)</button>
+      </div>
+    `);
+
+    setTimeout(() => {
+      $("#clearCart")?.addEventListener("click", () => {
+        cart.clear();
+        updateCartBadge();
+        renderProducts();
+        closeModal();
+        toast("Корзина очищена");
+      });
+      $("#checkout")?.addEventListener("click", () => {
+        closeModal();
+        toast("Оформление (демо). Подключим оплату позже.");
+      });
+
+      document.addEventListener("click", (ev) => {
+        const inc = ev.target.closest("[data-inc]");
+        const dec = ev.target.closest("[data-dec]");
+        if (!inc && !dec) return;
+
+        const id = (inc || dec).getAttribute(inc ? "data-inc" : "data-dec");
+        const cur = cart.get(id) || 0;
+        const next = inc ? cur + 1 : cur - 1;
+
+        if (next <= 0) cart.delete(id);
+        else cart.set(id, next);
+
+        updateCartBadge();
+        openCart();
+        renderProducts();
+      }, { once: true });
+    }, 0);
+  }
+
+  function updateCartBadge() {
+    const n = Array.from(cart.values()).reduce((a, b) => a + b, 0);
+    $("#cartCount").textContent = n ? String(n) : "0";
+  }
+
+  const overlay = $("#modalOverlay");
+  const modalTitle = $("#modalTitle");
+  const modalContent = $("#modalContent");
+
+  $("#closeModal").addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  function openModal(title, html) {
+    modalTitle.textContent = title;
+    modalContent.innerHTML = html;
+    overlay.style.display = "flex";
+  }
+  function closeModal() {
+    overlay.style.display = "none";
+    modalContent.innerHTML = "";
+  }
+
+  const toastEl = $("#toast");
+  let toastT;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(toastT);
+    toastT = setTimeout(() => (toastEl.style.display = "none"), 1800);
+  }
+
+  renderProducts();
+  updateCartBadge();
+
+  function fmtMoney(n) {
+    const cur = cfg.brand.currency || "";
+    const s = Number(n || 0).toLocaleString("ru-RU");
+    return `${s} ${cur}`.trim();
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function debounce(fn, ms) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), ms);
+    };
+  }
 })();
